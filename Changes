@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Interface.
 
+0.04.1 Thu Mar 16 19:45:28 2000
+	- hacked in a fix for MAC address, jerrad@networkengines.com
+
 0.01  Sat Nov 29 10:32:23 1997
 	- original version; created by h2xs 1.18
 

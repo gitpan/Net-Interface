@@ -1,0 +1,29 @@
+The documentation seems to be lacking, so here is the list of available
+methods:
+
+Functions
+Net::Interface::interfaces
+Net::Interface::new
+
+Attributes
+Net::Interface::name
+Net::Interface::metric
+Net::Interface::flags
+Net::Interface::mtu
+Net::Interface::destination
+Net::Interface::netmask
+Net::Interface::broadcast
+Net::Interface::hwaddress
+Net::Interface::address
+
+Internal use
+Net::Interface::_int_value
+Net::Interface::_addr_value
+
+NOTE: Addresses are retruned in binary, so to recover a string try:
+join(".", unpack("C*", $_->address))
+
+@F = split('', uc(unpack("H*", $_->hwaddress)));
+for($i=0;$i<scalar @F;$i+=2){
+    $MAC{$name} .= ($i+2<scalar @F ? "$F[$i]$F[$i+1]:" : "$F[$i]$F[$i+1]");
+}

@@ -278,8 +278,8 @@ _addr_value (...)
 	break;
 #ifdef SIOCGIFHWADDR
       case NI_HWADDR:
-	NI_ACCESS (fd, SIOCGIFHWADDR, ifr);
-	break;
+      NI_ACCESS (fd, SIOCGIFHWADDR, ifr);
+      break;
 #endif
       case NI_DSTADDR:
 	NI_ACCESS (fd, SIOCGIFDSTADDR, ifr);
@@ -299,11 +299,13 @@ _addr_value (...)
 	case NI_NETMASK:
 	  NI_ACCESS (fd, SIOCGIFNETMASK, ifr);
 	  break;
+/*
 #ifdef SIOCGIFHWADDR
 	case NI_HWADDR:
 	  NI_ACCESS (fd, SIOCGIFHWADDR, ifr);
 	  break;
 #endif
+*/
 	case NI_DSTADDR:
 	  NI_ACCESS (fd, SIOCGIFDSTADDR, ifr);
 	  break;
@@ -325,7 +327,13 @@ _addr_value (...)
 
       case AF_FILE:
 	if (array)
-	  PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));
+/Does not work */
+/*	  PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));*/
+/* Bad hack to get hardware address, copied INET mechanism from above,
+   returned last four digits of MAC, munge address and abs size to 6 */
+	  PUSHs (sv_2mortal (newSViv (6)));
+	PUSHs (sv_2mortal (newSVpv ((char *) (&sa.sin.sin_addr)-2,
+				      6)));
       }
     }
 
