@@ -161,7 +161,7 @@ new (...)
       stash = SvROK (ST (0)) ? SvSTASH (SvRV (ST (0))) : 
 	gv_stashsv (ST (0), 0);
       NI_NEW_REF (rv, sv, stash);
-      Move (SvPV (ST (1), na), ((ifreq *) SvPVX (sv))->ifr_name, 
+      Move (SvPV (ST (1), PL_na), ((ifreq *) SvPVX (sv))->ifr_name, 
 	    SvCUR (ST (1)) + 1, char);
       NI_CONNECT (fd);
       NI_ACCESS (fd, SIOCGIFFLAGS, SvPVX (sv));
@@ -201,7 +201,7 @@ _int_value (...)
       NI_REF_CHECK (ST (0));
       NI_CONNECT (fd);
       ifr = (ifreq *) SvPVX (SvRV (ST (0)));
-      ST (0) = &sv_undef;
+      ST (0) = &PL_sv_undef;
       switch (ix) {
       case NI_FLAGS:
 	NI_ACCESS (fd, SIOCGIFFLAGS, ifr);
@@ -263,7 +263,7 @@ _addr_value (...)
       NI_REF_CHECK (ST (0));
       NI_CONNECT (fd);
       ifr = (ifreq *) SvPVX (SvRV (ST (0)));
-      ST (0) = &sv_undef;
+      ST (0) = &PL_sv_undef;
       switch (ix) {
       case NI_ADDR:
 	NI_ACCESS (fd, SIOCGIFADDR, ifr);
@@ -327,7 +327,7 @@ _addr_value (...)
 
       case AF_FILE:
 	if (array)
-/Does not work */
+/*Does not work */
 /*	  PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));*/
 /* Bad hack to get hardware address, copied INET mechanism from above,
    returned last four digits of MAC, munge address and abs size to 6 */

@@ -20,7 +20,7 @@ Internal use
 Net::Interface::_int_value
 Net::Interface::_addr_value
 
-NOTE: Addresses are retruned in binary, so to recover a string try:
+NOTE: Addresses are returned in binary, so to recover a string try:
 join(".", unpack("C*", $_->address))
 
 @F = split('', uc(unpack("H*", $_->hwaddress)));
