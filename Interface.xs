@@ -18,13 +18,13 @@ extern "C" {
 */
 
 #ifndef AF_FILE
-#ifdef AF_UNIX
-#define AF_FILE AF_UNIX
-#endif
-#else
-#ifdef AF_LOCAL
-#define AF_FILE AF_LOCAL
-#endif
+# ifdef AF_UNIX
+#  define AF_FILE AF_UNIX
+# else
+#  ifdef AF_LOCAL
+#   define AF_FILE AF_LOCAL
+#  endif
+# endif
 #endif
 
 /*
@@ -99,28 +99,32 @@ void
 interfaces (ref)
   SV *ref;
 
-    PROTOTYPE: $
+  PROTOTYPE: $
 
-    PPCODE:
-	{
-	  struct ifconf ifc;
-	  ifreq *ifr;
-	  int fd, n;
-	  HV *stash;
-	  SV *rv, *sv;
+  PREINIT:
+    struct ifconf ifc;
+    ifreq *ifr;
+    int fd, n;
+    HV *stash;
+    SV *rv, *sv;
 
-	  NI_CONNECT (fd);
+  PPCODE:
+    {
+      NI_CONNECT (fd);
 #ifdef SIOCGIFCOUNT
-	  NI_ACCESS (fd, SIOCGIFCOUNT, &ifc.ifc_len);
-	  New (0xbad, ifr, ifc.ifc_len, struct ifreq);
-	  ifc.ifc_buf = ifr;
-	  ifc.ifc_len *= sizeof (ifreq);
-	  if (ioctl (fd, SIOCGIFCONF, &ifc) == -1) {
-	    Safefree (ifr);
-	    close (fd);
-	    XSRETURN_EMPTY;
-	  }
-#else
+      if (ioctl (fd, SIOCGIFCOUNT, &ifc) != -1) {
+	New (0xbad, ifr, ifc.ifc_len, struct ifreq);
+	ifc.ifc_req = ifr;
+	ifc.ifc_len *= sizeof (ifreq);
+	if (ioctl (fd, SIOCGIFCONF, &ifc) == -1) {
+	  Safefree (ifr);
+	  close (fd);
+	  XSRETURN_EMPTY;
+	}
+      }
+      else
+#endif
+	{
 	  n = 3;
 	  New (0xbad, ifr, n, ifreq);
 	  do {
@@ -132,127 +136,157 @@ interfaces (ref)
 	  while (ioctl (fd, SIOCGIFCONF, &ifc) == -1 || 
 		 ifc.ifc_len == n * sizeof (ifreq));
 	  NI_DISCONNECT (fd);
-#endif
-	  stash = SvROK (ref) ? SvSTASH (SvRV (ref)) : gv_stashsv (ref, 0);
-	  for (n = ifc.ifc_len / sizeof (ifreq); n; --n, ++ifr) {
-	    NI_NEW_REF (rv, sv, stash);
-	    Move (ifr, SvPVX (sv), 1, ifreq);
-	  }
-	  Safefree (ifc.ifc_req);
 	}
+      stash = SvROK (ref) ? SvSTASH (SvRV (ref)) : gv_stashsv (ref, 0);
+      for (n = ifc.ifc_len / sizeof (ifreq); n; --n, ++ifr) {
+	NI_NEW_REF (rv, sv, stash);
+	Move (ifr, SvPVX (sv), 1, ifreq);
+      }
+      Safefree (ifc.ifc_req);
+    }
 
 void
 new (...)
 
-    PROTOTYPE: $$
+  PROTOTYPE: $$
 
-    PREINIT:
-	SV *rv, *sv;
-        HV *stash;
-	int fd;
+  PREINIT:
+    SV *rv, *sv;
+    HV *stash;
+    int fd;
 
-    PPCODE:
-	NI_MAX_ARGS (2);
-	stash = SvROK (ST (0)) ? SvSTASH (SvRV (ST (0))) : 
-	  gv_stashsv (ST (0), 0);
-	NI_NEW_REF (rv, sv, stash);
-	Move (SvPV (ST (1), na), ((ifreq *) SvPVX (sv))->ifr_name, 
-	      SvCUR (ST (1)) + 1, char);
-	NI_CONNECT (fd);
-	NI_ACCESS (fd, SIOCGIFFLAGS, SvPVX (sv));
-	NI_DISCONNECT (fd);
-	XSRETURN (1);
+  PPCODE:
+    {
+      NI_MAX_ARGS (2);
+      stash = SvROK (ST (0)) ? SvSTASH (SvRV (ST (0))) : 
+	gv_stashsv (ST (0), 0);
+      NI_NEW_REF (rv, sv, stash);
+      Move (SvPV (ST (1), na), ((ifreq *) SvPVX (sv))->ifr_name, 
+	    SvCUR (ST (1)) + 1, char);
+      NI_CONNECT (fd);
+      NI_ACCESS (fd, SIOCGIFFLAGS, SvPVX (sv));
+      NI_DISCONNECT (fd);
+      XSRETURN (1);
+    }
 
 void
 name (...)
 
-    PROTOTYPE: $
+  PROTOTYPE: $
 
-    PPCODE:
-	NI_MAX_ARGS (1);
-	NI_REF_CHECK (ST (0));
-	XSRETURN_PV (SvPVX (SvRV (ST (0))));
+  PPCODE:
+    {
+      NI_MAX_ARGS (1);
+      NI_REF_CHECK (ST (0));
+      XSRETURN_PV (SvPVX (SvRV (ST (0))));
+    }
 
 void
 _int_value (...)
 
-    PROTOTYPE: $;$
+  PROTOTYPE: $;$
 
-    PREINIT:
-	register int fd;
-	ifreq *ifr;
+  PREINIT:
+    int fd;
+    ifreq *ifr;
 
-    ALIAS:
-	flags = NI_FLAGS
-	mtu = NI_MTU
-	metric = NI_METRIC
+  ALIAS:
+    flags = NI_FLAGS
+    mtu = NI_MTU
+    metric = NI_METRIC
 
-    PPCODE:
-	NI_MAX_ARGS (2);
-	NI_REF_CHECK (ST (0));
-	NI_CONNECT (fd);
-	ifr = (ifreq *) SvPVX (SvRV (ST (0)));
-	ST (0) = &sv_undef;
+  PPCODE:
+    {
+      NI_MAX_ARGS (2);
+      NI_REF_CHECK (ST (0));
+      NI_CONNECT (fd);
+      ifr = (ifreq *) SvPVX (SvRV (ST (0)));
+      ST (0) = &sv_undef;
+      switch (ix) {
+      case NI_FLAGS:
+	NI_ACCESS (fd, SIOCGIFFLAGS, ifr);
+	XST_mIV (0, ifr->ifr_flags);
+	break;
+
+      case NI_MTU:
+	NI_ACCESS (fd, SIOCGIFMTU, ifr);
+	XST_mIV (0, ifr->ifr_mtu);
+	break;
+
+      case NI_METRIC:
+	NI_ACCESS (fd, SIOCGIFMETRIC, ifr);
+	XST_mIV (0, ifr->ifr_metric);
+	break;
+      }
+      if (items == 2) {
 	switch (ix) {
 	case NI_FLAGS:
-	  NI_ACCESS (fd, SIOCGIFFLAGS, ifr);
-	  XST_mIV (0, ifr->ifr_flags);
+	  ifr->ifr_flags = SvIV (ST (1));
+	  NI_ACCESS (fd, SIOCSIFFLAGS, ifr);
 	  break;
 
 	case NI_MTU:
-	  NI_ACCESS (fd, SIOCGIFMTU, ifr);
-	  XST_mIV (0, ifr->ifr_mtu);
+	  ifr->ifr_mtu = SvIV (ST (1));
+	  NI_ACCESS (fd, SIOCSIFMTU, ifr);
 	  break;
 
 	case NI_METRIC:
-	  NI_ACCESS (fd, SIOCGIFMETRIC, ifr);
-	  XST_mIV (0, ifr->ifr_metric);
+	  ifr->ifr_metric = SvIV (ST (1));
+	  NI_ACCESS (fd, SIOCSIFMETRIC, ifr);
 	  break;
 	}
-	if (items == 2) {
-	  switch (ix) {
-	  case NI_FLAGS:
-	    ifr->ifr_flags = SvIV (ST (1));
-	    NI_ACCESS (fd, SIOCSIFFLAGS, ifr);
-	    break;
-
-	  case NI_MTU:
-	    ifr->ifr_mtu = SvIV (ST (1));
-	    NI_ACCESS (fd, SIOCSIFMTU, ifr);
-	    break;
-
-	  case NI_METRIC:
-	    ifr->ifr_metric = SvIV (ST (1));
-	    NI_ACCESS (fd, SIOCSIFMETRIC, ifr);
-	    break;
-	  }
-	}
-	NI_DISCONNECT (fd);
-	XSRETURN (1);
+      }
+      NI_DISCONNECT (fd);
+      XSRETURN (1);
+    }
 
 void
 _addr_value (...)
 
-    PROTOTYPE: $;$
+  PROTOTYPE: $;$
 
-    PREINIT:
-	register int fd, array = 0;
-	ifreq *ifr;
-	sockaddr_all sa;
+  PREINIT:
+    int fd, array = 0;
+    ifreq *ifr;
+    sockaddr_all sa;
 
-    ALIAS:
-	address = NI_ADDR
-	broadcast = NI_BRDADDR
-	netmask = NI_NETMASK
-	hwaddress = NI_HWADDR
-	destination = NI_DSTADDR
+  ALIAS:
+    address = NI_ADDR
+    broadcast = NI_BRDADDR
+    netmask = NI_NETMASK
+    hwaddress = NI_HWADDR
+    destination = NI_DSTADDR
 
-    PPCODE:
-	NI_MAX_ARGS (2);
-	NI_REF_CHECK (ST (0));
-	NI_CONNECT (fd);
-	ifr = (ifreq *) SvPVX (SvRV (ST (0)));
-	ST (0) = &sv_undef;
+  PPCODE:
+    {
+      NI_MAX_ARGS (2);
+      NI_REF_CHECK (ST (0));
+      NI_CONNECT (fd);
+      ifr = (ifreq *) SvPVX (SvRV (ST (0)));
+      ST (0) = &sv_undef;
+      switch (ix) {
+      case NI_ADDR:
+	NI_ACCESS (fd, SIOCGIFADDR, ifr);
+	break;
+
+      case NI_BRDADDR:
+	NI_ACCESS (fd, SIOCGIFBRDADDR, ifr);
+	break;
+
+      case NI_NETMASK:
+	NI_ACCESS (fd, SIOCGIFNETMASK, ifr);
+	break;
+#ifdef SIOCGIFHWADDR
+      case NI_HWADDR:
+	NI_ACCESS (fd, SIOCGIFHWADDR, ifr);
+	break;
+#endif
+      case NI_DSTADDR:
+	NI_ACCESS (fd, SIOCGIFDSTADDR, ifr);
+	break;
+      }
+      Move (&(ifr->ifr_addr), &sa, 1, sockaddr_all);
+      if (items == 2) {
 	switch (ix) {
 	case NI_ADDR:
 	  NI_ACCESS (fd, SIOCGIFADDR, ifr);
@@ -274,48 +308,26 @@ _addr_value (...)
 	  NI_ACCESS (fd, SIOCGIFDSTADDR, ifr);
 	  break;
 	}
-	Move (&(ifr->ifr_addr), &sa, 1, sockaddr_all);
-	if (items == 2) {
-	  switch (ix) {
-	  case NI_ADDR:
-	    NI_ACCESS (fd, SIOCGIFADDR, ifr);
-	    break;
-
-	  case NI_BRDADDR:
-	    NI_ACCESS (fd, SIOCGIFBRDADDR, ifr);
-	    break;
-
-	  case NI_NETMASK:
-	    NI_ACCESS (fd, SIOCGIFNETMASK, ifr);
-	    break;
-#ifdef SIOCGIFHWADDR
-	  case NI_HWADDR:
-	    NI_ACCESS (fd, SIOCGIFHWADDR, ifr);
-	    break;
-#endif
-	  case NI_DSTADDR:
-	    NI_ACCESS (fd, SIOCGIFDSTADDR, ifr);
-	    break;
-	  }
-	}
-	NI_DISCONNECT (fd);
-	array = (GIMME_V == G_ARRAY);
-	if (array) {
-	  EXTEND (sp, 2);
-	  PUSHs (sv_2mortal (newSViv (sa.sa.sa_family)));
-	}
-	switch (sa.sa.sa_family) {
-	case AF_INET:
-	  if (array)
-	    PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));
-	  PUSHs (sv_2mortal (newSVpv ((char *) &sa.sin.sin_addr,
+      }
+      NI_DISCONNECT (fd);
+      array = (GIMME_V == G_ARRAY);
+      if (array) {
+	EXTEND (sp, 2);
+	PUSHs (sv_2mortal (newSViv (sa.sa.sa_family)));
+      }
+      switch (sa.sa.sa_family) {
+      case AF_INET:
+	if (array)
+	  PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));
+	PUSHs (sv_2mortal (newSVpv ((char *) &sa.sin.sin_addr,
 				      sizeof (sa.sin.sin_addr))));
-	  break;
+	break;
 
-	case AF_FILE:
-	  if (array)
-	    PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));
-	}
+      case AF_FILE:
+	if (array)
+	  PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));
+      }
+    }
 
 #sub ifr_map () { &ifr_ifru. &ifru_map;}
 #sub ifr_slave () { &ifr_ifru. &ifru_slave;}

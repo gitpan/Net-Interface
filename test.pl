@@ -35,5 +35,5 @@ package TEST;
 
 @ISA = qw (Net::Interface);
 my @y = (__PACKAGE__->new ($loopback))->address;
-print $m eq $y[2] ? "ok 5\n" : "not ok 5\n";
+print $m == $y[2] ? "ok 5\n" : "not ok 5\n";
 1;

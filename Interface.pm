@@ -11,10 +11,26 @@ require AutoLoader;
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
-	
+@EXPORT_OK = qw(
+		IFF_UP,
+		IFF_BROADCAST,
+		IFF_DEBUG,
+		IFF_LOOPBACK,
+		IFF_POINTOPOINT,
+		IFF_NOTRAILERS,
+		IFF_RUNNING,
+		IFF_NOARP,
+		IFF_PROMISC,
+		IFF_ALLMULTI,
+		IFF_MASTER,
+		IFF_SLAVE,
+		IFF_MULTICAST,
+		IFF_SOFTHEADERS,
+		IFHWADDRLEN,
+		IFNAMSIZ,
 );
-$VERSION = '0.03';
+
+$VERSION = '0.04';
 
 bootstrap Net::Interface $VERSION;
 
@@ -66,10 +82,9 @@ unnecessary from within Perl.  It provides methods to get at set all
 the attributes of an interface, and even create new logical or
 physical interfaces (if your O/S supports it).
 
+=head1 AUTHOR
 
-=head1 szander@ix.netcom.com
-
-A. U. Thor, a.u.thor@a.galaxy.far.far.away
+Stephen Zander <gibreel@pobox.com>
 
 =head1 SEE ALSO
 
