@@ -14,6 +14,14 @@ extern "C" {
 #endif
 
 /*
+** Fix up missing definition
+*/
+
+#ifndef IFHWADDRLEN
+# define IFHWADDRLEN    6
+#endif
+
+/*
 ** Fix up non-POSIX compliant address family names
 */
 
@@ -92,8 +100,6 @@ MODULE = Net::Interface	PACKAGE = Net::Interface
 
 #sub ifa_broadaddr () { &ifa_ifu. &ifu_broadaddr;}
 #sub ifa_dstaddr () { &ifa_ifu. &ifu_dstaddr;}
-
-MODULE = Net::Interface	PACKAGE = Net::Interface
 
 void
 interfaces (ref)
@@ -331,9 +337,9 @@ _addr_value (...)
 /*	  PUSHs (sv_2mortal (newSViv (sizeof (sa.sin.sin_addr))));*/
 /* Bad hack to get hardware address, copied INET mechanism from above,
    returned last four digits of MAC, munge address and abs size to 6 */
-	  PUSHs (sv_2mortal (newSViv (6)));
-	PUSHs (sv_2mortal (newSVpv ((char *) (&sa.sin.sin_addr)-2,
-				      6)));
+	  PUSHs (sv_2mortal (newSViv (IFHWADDRLEN)));
+	PUSHs (sv_2mortal (newSVpv ((char *) (&sa.sa.sa_data),
+				      IFHWADDRLEN)));
       }
     }
 

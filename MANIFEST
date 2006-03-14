@@ -1,9 +1,12 @@
-COPYRIGHT
 README
+README.jdp
 Changes
 Interface.pm
 Interface.xs
 MANIFEST
 Makefile.PL
 hints/solaris_2.pl
-test.pl
+ppport.h
+t/if.t
+t/mac_bin2hex.t
+META.yml                                 Module meta-data (added by MakeMaker)

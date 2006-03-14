@@ -6,9 +6,13 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..5\n"; }
+BEGIN { $| = 1; print "1..7\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use Net::Interface;
+
+#use diagnostics;
+use Socket;
+
+require Net::Interface;
 $loaded = 1;
 print "ok 1\n";
 
@@ -20,7 +24,7 @@ print "ok 1\n";
 
 use POSIX qw(EPERM);
 
-my $loopback = $^O eq solaris ? "lo0" : $^O eq "linux" ? "lo" : undef;
+my $loopback = ($^O eq 'solaris') ? "lo0" : ($^O eq 'linux') ? "lo" : undef;
 
 my ($i) = Net::Interface->interfaces ();
 print $i ? "ok 2\n" : "not ok 2: $!\n";
@@ -30,10 +34,20 @@ my $m = $i->mtu (576);
 print (($m || $! == EPERM) ? "ok 4\n" : "not ok 4: $!\n");
 $m = $i->mtu ($m);
 $m = $i->address;
+print "missing interface address\nnot "
+	unless ($m = inet_ntoa($m));
+print "ok 5\n";
 
 package TEST;
 
 @ISA = qw (Net::Interface);
 my @y = (__PACKAGE__->new ($loopback))->address;
-print $m == $y[2] ? "ok 5\n" : "not ok 5\n";
+
+print "missing interface address in array\nnot "
+	unless ($y[2] = main::inet_ntoa($y[2]));
+print "ok 6\n";
+
+print "got: $y[2], exp: $m\nnot "
+	unless $m eq $y[2];;
+print "ok 7\n";
 1;
