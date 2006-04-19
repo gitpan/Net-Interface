@@ -33,7 +33,7 @@ require DynaLoader;
   constants	=> [@EXPORT_OK],
 );
 
-$VERSION = '0.06';
+$VERSION = '0.08';
 
 bootstrap Net::Interface $VERSION;
 
@@ -60,7 +60,7 @@ sub IFNAMSIZ () {16;}
 sub mac_bin2hex {
   my $binmac = shift;
   return '' unless $binmac;
-  sprintf("%s%s:%s%s:%s%s:%s%s:%s%s:%s%s",split('',uc unpack("H*",$binmac)));
+  sprintf("%s%s:%s%s:%s%s:%s%s:%s%s:%s%s",split('',uc unpack("H12",$binmac)));
 }
 
 sub DESTROY () {}
@@ -107,9 +107,13 @@ Net::Interface - Perl extension to access network interfaces
   
 =head2 METHODS
 
-  @if_names = Net::Interface->interfaces();
+  @all_ifs = Net::Interface->interfaces();
+
+  foreach(@all_ifs) { print $_->name,"\n" };
 
   $if = Net::Interface->new ('eth0');
+
+  my $name = $if->name;
 
   Get or Set
   $naddr = $if->address($naddr);
