@@ -101,6 +101,10 @@ MODULE = Net::Interface	PACKAGE = Net::Interface
 #sub ifa_broadaddr () { &ifa_ifu. &ifu_broadaddr;}
 #sub ifa_dstaddr () { &ifa_ifu. &ifu_dstaddr;}
 
+#ifndef _SIZEOF_ADDR_IFREQ
+#define _SIZEOF_ADDR_IFREQ(ifr) (sizeof( struct ifreq ))
+#endif
+
 void
 interfaces (ref)
   SV *ref;
@@ -110,6 +114,7 @@ interfaces (ref)
   PREINIT:
     struct ifconf ifc;
     ifreq *ifr;
+    ifreq *end;
     int fd, n;
     HV *stash;
     SV *rv, *sv;
@@ -144,9 +149,12 @@ interfaces (ref)
 	  NI_DISCONNECT (fd);
 	}
       stash = SvROK (ref) ? SvSTASH (SvRV (ref)) : gv_stashsv (ref, 0);
-      for (n = ifc.ifc_len / sizeof (ifreq); n; --n, ++ifr) {
+      ifr= (struct ifreq *) ifc.ifc_req;
+      end= (struct ifreq *) ((char *) ifr + ifc.ifc_len);
+      while (ifr < end) {
 	NI_NEW_REF (rv, sv, stash);
 	Move (ifr, SvPVX (sv), 1, ifreq);
+        ifr= (struct ifreq *)((char *)ifr + _SIZEOF_ADDR_IFREQ( *ifr ) );
       }
       Safefree (ifc.ifc_req);
     }

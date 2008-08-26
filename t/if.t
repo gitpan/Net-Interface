@@ -24,7 +24,7 @@ print "ok 1\n";
 
 use POSIX qw(EPERM);
 
-my $loopback = ($^O eq 'solaris') ? "lo0" : ($^O eq 'linux') ? "lo" : undef;
+my $loopback = ($^O eq 'solaris') ? "lo0" : ($^O eq 'linux') ? "lo" : ($^O eq 'darwin') ? "lo0" : undef;
 
 my ($i) = Net::Interface->interfaces ();
 print $i ? "ok 2\n" : "not ok 2: $!\n";

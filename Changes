@@ -1,6 +1,13 @@
 Revision history for Perl extension Net::Interface.
 
-0.08
+0.09  Tue Aug 26 16:10:24 PDT 2008
+	In MAC os 10.5.4 it was noticed that  
+	*struct ifreq* is no longer a fixed width structure 
+
+	Thanks to "Keith Peters" keith@blekko.com for finding
+	this and submitting a patch to fix it up.
+
+0.08  September 11, 2006
 	update mac_bin2hex to use specific length in unpack
 	instead of H*
 
