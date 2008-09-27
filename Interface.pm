@@ -33,7 +33,7 @@ require DynaLoader;
   constants	=> [@EXPORT_OK],
 );
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 bootstrap Net::Interface $VERSION;
 
