@@ -33,7 +33,7 @@ require DynaLoader;
   constants	=> [@EXPORT_OK],
 );
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 bootstrap Net::Interface $VERSION;
 
@@ -224,16 +224,20 @@ hardware interface.
   recent updates by:
   Jerrad Pierce jpierce@cpan.org
   Michael Robinton <michael@bizsystems.com>
+  Jens Rehsack <rehsack@web.de>
 
-=head1 COPYRIGHT  1998, Stephen Zander. All rights reserved.
+=head1 COPYRIGHT  1998 - 2008. All rights reserved.
+
+  Stephen Zander	1998
+  Jerrad Pierce		2000
+  Michael Robinton	2006 - 2008
+  Jens Rehsack 		2008
+
+  All rights reserved.
 
   Parts of the text of this README copyright 1996,1997 Graham Barr.
   All rights reserved.
 
-  This library is free software; you can redistribute it 
-  and/or modify it under the same terms as Perl itself.
-
-  Copyright 2006 Michael Robinton
   This library is free software; you can redistribute it 
   and/or modify it under the same terms as Perl itself.
 

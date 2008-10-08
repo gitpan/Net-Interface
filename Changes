@@ -1,5 +1,16 @@
 Revision history for Perl extension Net::Interface.
 
+0.11  Mon Oct  6 16:23:36 PDT 2008
+	incorporate code into the build process to determine 
+	underlying OS's memory PAGE_SIZE
+
+	add checkfor SA_LEN
+
+	include various socket address checks from perl's Socket.xs
+
+	updated t/if.t to remove reference to interface 'lo and lo0'
+	and dependence on POSIX::EPERM
+
 0.10  Sat Sep 27 10:52:26 PDT 2008
 	ifreq patch in 0.09 revised to support additional platforms
         patchs submitted by Jens Rehsack REHSACK@cpan.org

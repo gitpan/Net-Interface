@@ -1,12 +1,14 @@
-README
-README.jdp
+README.old.sz
+README.old.jdp
 Changes
 Interface.pm
 Interface.xs
 MANIFEST
+MANIFEST.SKIP
 Makefile.PL
 hints/solaris_2.pl
 ppport.h
+siteconf
 t/if.t
 t/mac_bin2hex.t
 META.yml                                 Module meta-data (added by MakeMaker)

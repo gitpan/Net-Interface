@@ -5,16 +5,14 @@ extern "C" {
 #include "perl.h"
 #include "XSUB.h"
 
-#include <sys/socket.h>
+#include "localStuff.h"
+
 #include <net/if.h>
 #include <errno.h>
 #include <strings.h>
 #ifdef __linux__
 #include </usr/include/sys/user.h>
 #include <linux/sockios.h>
-#endif
-#ifdef __APPLE__
-#include <mach/machine/vm_param.h>
 #endif
 
 #ifdef __cplusplus
@@ -48,7 +46,7 @@ extern "C" {
 */
 
 #ifndef SA_LEN
-#ifdef __linux__
+#ifndef HAVE_SA_LEN
 static int
 __libc_sa_len (const sa_family_t af)
 {
@@ -81,7 +79,7 @@ __libc_sa_len (const sa_family_t af)
    }
    return -1;
 }
-#define SA_LEN(sa) (((struct sockaddr)(sa)).sa_family)
+#define SA_LEN(sa) __libc_sa_len(((struct sockaddr)(sa)).sa_family)
 #else
 #define SA_LEN(sa) ((sa).sa_len)
 #endif
@@ -149,13 +147,13 @@ typedef union sockaddr_all {
 #define NI_DISCONNECT(fd) close (fd)
 
 /*
-** max size of struct ifreq can be > PATH_MAX -> let's alloc PAGE_SIZE
+** max size of struct ifreq can be > PATH_MAX -> let's alloc MY_PGSIZE
 */
 #define        NI_NEW_REF(rv,sv,stash) \
         sv = newSV (0); \
         rv = sv_2mortal (newRV_noinc (sv)); \
         sv_bless (rv, stash); \
-        SvGROW (sv, PAGE_SIZE); \
+        SvGROW (sv, MY_PGSIZE); \
         SvREADONLY_on (sv); \
         XPUSHs (rv);
 
@@ -174,7 +172,7 @@ typedef union sockaddr_all {
 /*
 ** Fix up for perl's New()/Renew() interface
 */
-typedef struct { uint8_t pgsize_array[PAGE_SIZE]; } pgsize_as;
+typedef struct { uint8_t pgsize_array[MY_PGSIZE]; } pgsize_as;
 
 MODULE = Net::Interface        PACKAGE = Net::Interface
 
@@ -446,3 +444,4 @@ _addr_value (...)
 #sub ifr_data () { &ifr_ifru. &ifru_data;}
 #sub ifc_buf () { &ifc_ifcu. &ifcu_buf;}
 #sub ifc_req () { &ifc_ifcu. &ifcu_req;}
+
