@@ -25,6 +25,7 @@ require DynaLoader;
 		IFF_SLAVE
 		IFF_MULTICAST
 		IFF_SOFTHEADERS
+        AF_INET
 		IFHWADDRLEN
 		IFNAMSIZ
 		mac_bin2hex
@@ -33,7 +34,7 @@ require DynaLoader;
   constants	=> [@EXPORT_OK],
 );
 
-$VERSION = '0.11';
+$VERSION = '0.13_01';
 
 bootstrap Net::Interface $VERSION;
 
@@ -53,6 +54,8 @@ sub IFF_MASTER () {0x400;}
 sub IFF_SLAVE () {0x800;}
 sub IFF_MULTICAST () {0x1000;}
 sub IFF_SOFTHEADERS () {0x2000;}
+
+sub AF_INET() {2;}
 
 sub IFHWADDRLEN () {6;}
 sub IFNAMSIZ () {16;}

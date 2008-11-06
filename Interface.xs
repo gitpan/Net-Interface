@@ -5,7 +5,7 @@ extern "C" {
 #include "perl.h"
 #include "XSUB.h"
 
-#include "localStuff.h"
+#include "config.h"
 
 #include <net/if.h>
 #include <errno.h>
@@ -139,7 +139,6 @@ typedef union sockaddr_all {
 
 #define NI_ACCESS(fd,value,buf) \
         if (ioctl (fd, value, buf) == -1) { \
-	  perror("NI_ACCESS: "); \
           NI_DISCONNECT (fd); \
           XSRETURN_EMPTY; \
         }
@@ -147,21 +146,22 @@ typedef union sockaddr_all {
 #define NI_DISCONNECT(fd) close (fd)
 
 /*
-** max size of struct ifreq can be > PATH_MAX -> let's alloc MY_PGSIZE
+** max size of struct ifreq can be > PATH_MAX -> let's alloc PAGE_SIZE
 */
-#define        NI_NEW_REF(rv,sv,stash) \
+#define NI_NEW_REF(rv,sv,stash) \
         sv = newSV (0); \
         rv = sv_2mortal (newRV_noinc (sv)); \
         sv_bless (rv, stash); \
-        SvGROW (sv, MY_PGSIZE); \
+        SvGROW (sv, PAGE_SIZE); \
         SvREADONLY_on (sv); \
         XPUSHs (rv);
 
-#define        NI_NEW_IFREQ_REF(rv,sv,stash,ifr) \
+#define NI_NEW_IFREQ_REF(rv,sv,stash,ifr) \
         sv = newSV (0); \
         rv = sv_2mortal (newRV_noinc (sv)); \
         sv_bless (rv, stash); \
         SvGROW (sv, _SIZEOF_ADDR_IFREQ(*ifr)); \
+        memmove (SvPVX (sv), ifr, _SIZEOF_ADDR_IFREQ(*ifr)); \
         SvREADONLY_on (sv); \
         XPUSHs (rv);
 
@@ -172,7 +172,50 @@ typedef union sockaddr_all {
 /*
 ** Fix up for perl's New()/Renew() interface
 */
-typedef struct { uint8_t pgsize_array[MY_PGSIZE]; } pgsize_as;
+typedef struct { uint8_t pgsize_array[PAGE_SIZE]; } pgsize_as;
+
+struct ifconf *
+getifreqs(struct ifconf *ifc)
+{
+  int fd, n;
+  struct ifreq *ifr;
+
+  if ((fd = socket (PF_INET, SOCK_DGRAM, 0)) == -1)
+    return NULL;
+  bzero(ifc, sizeof(*ifc));
+#ifdef SIOCGIFCOUNT
+  if (ioctl (fd, SIOCGIFCOUNT, ifc) != -1)
+  {
+    New (0xbad, ifr, ifc.ifc_len, struct ifreq);
+    ifc->ifc_req = ifr;
+    ifc->ifc_len *= sizeof (*ifr);
+    if (ioctl (fd, SIOCGIFCONF, ifc) == -1)
+    {
+      Safefree (ifr);
+      close (fd);
+      return NULL;
+    }
+  }
+  else
+#endif
+  {
+    n = 1;
+    /* New (0xbad, ifr, n, pgsize_as); */
+    ifr = (struct ifreq *)safemalloc( (MEM_SIZE)((n)*sizeof(pgsize_as)) );
+    do
+    {
+      n *= 2;
+      ifr = (struct ifreq *)saferealloc( (Malloc_t)ifr, (MEM_SIZE)(n*sizeof(pgsize_as)) );
+      ifc->ifc_req = ifr;
+      ifc->ifc_len = n * sizeof(pgsize_as);
+    }
+    while( ( ioctl( fd, SIOCGIFCONF, ifc ) == -1 ) ||
+           ( ifc->ifc_len >= ( (n-1) * sizeof(pgsize_as))) );
+    NI_DISCONNECT (fd);
+  }
+
+  return ifc;
+}
 
 MODULE = Net::Interface        PACKAGE = Net::Interface
 
@@ -186,62 +229,66 @@ interfaces (ref)
   PROTOTYPE: $
 
   PREINIT:
-    struct ifconf ifc;
-    struct ifreq *ifr, *lifr;
-    int fd, n;
-    HV *stash;
-    SV *rv, *sv;
 
   PPCODE:
     {
-      NI_CONNECT (fd);
-      bzero(&ifc, sizeof(ifc));
-#ifdef SIOCGIFCOUNT
-      if (ioctl (fd, SIOCGIFCOUNT, &ifc) != -1) {
-        New (0xbad, ifr, ifc.ifc_len, struct ifreq);
-        ifc.ifc_req = ifr;
-        ifc.ifc_len *= sizeof (*ifr);
-        if (ioctl (fd, SIOCGIFCONF, &ifc) == -1) {
-          Safefree (ifr);
-          close (fd);
-          XSRETURN_EMPTY;
-        }
-      }
-      else
-#endif
+      struct ifconf ifc;
+      if( getifreqs(&ifc) )
       {
-        n = 1;
-        /* New (0xbad, ifr, n, pgsize_as); */
-        ifr = (struct ifreq *)safemalloc( (MEM_SIZE)((n)*sizeof(pgsize_as)) );
-        do {
-          n *= 2;
-          ifr = (struct ifreq *)saferealloc( (Malloc_t)ifr, (MEM_SIZE)(n*sizeof(pgsize_as)) );
-          ifc.ifc_req = ifr;
-          ifc.ifc_len = n * sizeof(pgsize_as);
-        }
-        while( ( ioctl( fd, SIOCGIFCONF, &ifc ) == -1 ) ||
-               ( ifc.ifc_len >= ( (n-1) * sizeof(pgsize_as))) );
-        NI_DISCONNECT (fd);
-      }
-      stash = SvROK (ref) ? SvSTASH (SvRV (ref)) : gv_stashsv (ref, 0);
+        SV *rv, *sv;
+        HV *stash = SvROK (ref) ? SvSTASH (SvRV (ref)) : gv_stashsv (ref, 0);
+        struct ifreq *ifr = ifc.ifc_req, *lifr = (struct ifreq *)&ifc.ifc_buf[ifc.ifc_len];
 
-      lifr = (struct ifreq *)&ifc.ifc_buf[ifc.ifc_len];
-      while (ifr < lifr)
-      {
-        struct sockaddr *sa = &ifr->ifr_ifru.ifru_addr;
-#ifndef __linux__
-        if( AF_LINK != sa->sa_family ) /* collect only the AF_LINK entries */
+        lifr = (struct ifreq *)&ifc.ifc_buf[ifc.ifc_len];
+        while (ifr < lifr)
         {
+          struct sockaddr *sa = &ifr->ifr_ifru.ifru_addr;
+
+          NI_NEW_IFREQ_REF (rv, sv, stash, ifr);
           ifr = (struct ifreq *)(((char *)ifr) + _SIZEOF_ADDR_IFREQ(*ifr));
-          continue;
         }
-#endif
-        NI_NEW_IFREQ_REF (rv, sv, stash, ifr);
-        memmove (SvPVX (sv), ifr, _SIZEOF_ADDR_IFREQ(*ifr));
-        ifr = (struct ifreq *)(((char *)ifr) + _SIZEOF_ADDR_IFREQ(*ifr));
+        Safefree (ifc.ifc_req);
+      }
+    }
+
+void
+interfaceNames(ref)
+  SV *ref;
+
+  PROTOTYPE: $
+
+  PPCODE:
+  {
+    struct ifconf ifc;
+    if( getifreqs(&ifc) )
+    {
+      HV * toUniq = (HV *)( sv_2mortal( (SV *)(newHV()) ) );
+      if( NULL != toUniq )
+      {
+        HE *hentry;
+        char *hekey;
+        struct ifreq *ifr = ifc.ifc_req, *lifr = (struct ifreq *)&ifc.ifc_buf[ifc.ifc_len];
+
+        while (ifr < lifr)
+        {
+          hv_store( toUniq, ifr->ifr_name, strlen(ifr->ifr_name), NULL, 0 );
+          ifr = (struct ifreq *)(((char *)ifr) + _SIZEOF_ADDR_IFREQ(*ifr));
+        }
+
+        (void)hv_iterinit(toUniq);
+        while( NULL != ( hentry = hv_iternext(toUniq) ) )
+        {
+          I32 keylen;
+          hekey = hv_iterkey(hentry, &keylen);
+          assert( strlen(hekey) == keylen );
+          XPUSHs( sv_2mortal( newSVpv(hekey, keylen) ) );
+        }
+
+        hv_undef( toUniq );
       }
       Safefree (ifc.ifc_req);
     }
+  }
 
 void
 new (...)
@@ -278,6 +325,22 @@ name (...)
       NI_REF_CHECK (ST (0));
       XSRETURN_PV (SvPVX (SvRV (ST (0))));
     }
+
+int
+af (...)
+
+  PROTOTYPE: $
+
+  CODE:
+    {
+      struct ifreq *ifr;
+      NI_MAX_ARGS (1);
+      NI_REF_CHECK (ST (0));
+      ifr = (struct ifreq *)( SvPVX( SvRV( ST(0) ) ) );
+      RETVAL = ifr->ifr_ifru.ifru_addr.sa_family;
+    }
+
+  OUTPUT: RETVAL
 
 void
 _int_value (...)

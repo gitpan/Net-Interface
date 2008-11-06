@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::Interface.
 
+0.13
+	update config.h with autoconf
+
+0.12 not released
+	rework if.t again
+
 0.11  Mon Oct  6 16:23:36 PDT 2008
 	incorporate code into the build process to determine 
 	underlying OS's memory PAGE_SIZE

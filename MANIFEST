@@ -7,8 +7,9 @@ MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 hints/solaris_2.pl
+config.h.in
+configure
 ppport.h
-siteconf
 t/if.t
 t/mac_bin2hex.t
 META.yml                                 Module meta-data (added by MakeMaker)
