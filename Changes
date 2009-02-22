@@ -1,5 +1,74 @@
 Revision history for Perl extension Net::Interface.
 
+1.001  Sat Feb 21 18:30:07 PST 2009
+	BETA 1 release.
+
+	correct symbol typo in ni_lifreq.c
+
+	add inet_aton for systems that don't have it like old Solaris
+
+	fixed bad cast for "flags" in multiple files, changed
+	from an 'int' to a 'short'
+
+	add SIOCGENADDR support for Solaris
+
+	removed KAME bits from 6adrs in Interface.xs af_common
+
+	in Interfaces.pm, change &AF_INET to AF_INET to accomodate 
+	broken Perl 5.8.4
+
+	in Interfaces.xs, check for LOOPBACK interface and bypass MAC
+	address processing if found
+
+	add file ni_fallbackhwaddr.c with lots of ways to get the MAC
+	address when it is not presented in a _DL or _LL record.
+	eliminate get_hwaddr in af_inetX.c and ni_linuxproc.c
+
+	corrected addr42txt call that requests array rather than scalar
+	return value from ->address(fam,index
+
+	added methods for update of flags, mtu, metric as well as 
+	refreshing the particular interface object 
+
+	updated inst/netsymbols.pl to accomodate value that exceed what
+	fits in an I32
+
+	make char, u_char casting adjustments for picky Solaris 'cc' compiler
+
+	added get_ifreqs and get_ifaddrs for Solaris, activated lifreq
+	developer interface.
+
+	Expanded "flags" to an NV (u_int64_t) to accomodate extended flags
+	on Solaris.
+
+	Add method to get "index" of the interface
+
+	Consolidate AF_family support into ni_af_common.c and change 
+	general SIOCxxxxx use to be ifreq family specific
+
+1.000 Sat Jan 31 14:43:16 PST 2009
+	updated documentation with more info about using symbols
+
+	added filter to always use numeric values of symbols
+	when doing $if->address($fam,$idx) type operations.
+
+	updated faceinfo.t to use (test) above syntax
+
+	updated version string to support 3 digits post decimal point
+
+0.90  Mon Jan 26 01:16:53 PST 2009
+	completed initial API and implementation of most read
+	in Interface.pm
+
+      Fri Jan 23 17:32:15 PST 2009
+	first working version of the re-written module including 
+	ipV6 support in Interface.xs
+
+0.15
+	development no release
+
+0.14  Mon Jan  5 16:26:27 PST 2009
+	development no release
 0.13
 	update config.h with autoconf
 

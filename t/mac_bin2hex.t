@@ -6,11 +6,10 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..2\n"; }
+BEGIN { $| = 1; print "1..3\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 #use diagnostics;
-use Socket;
 
 use Net::Interface qw(mac_bin2hex);
 $loaded = 1;
@@ -28,5 +27,7 @@ print "got: $_\nexp: $exp\nnot "
 	unless ($_ = mac_bin2hex($binmac)) eq $exp;
 print "ok 2\n";
 
-
-
+my $bo = _bo Net::Interface();
+print "got: $_\nexp: $exp\nnot "
+	unless ($_ = $bo->mac_bin2hex($binmac)) eq $exp;
+print "ok 3\n";
