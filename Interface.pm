@@ -44,7 +44,7 @@ $EXPORT_TAGS{inet} = [qw(
 	inet_ntop
 )];
 
-$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.1 $ =~ /\d+/g) };
+$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.2 $ =~ /\d+/g) };
 
 bootstrap Net::Interface $VERSION;
 
@@ -166,7 +166,8 @@ Net::Interface - Perl extension to access network interfaces
   :constants is a deprecated synonym for :ifs
 
 See L<Net::Interface::NetSymbols> built specifically for this platform for 
-a detailed list and description of all symbols available on this architecture.
+a detailed list and description of all symbols available on this specific
+architecture and operating systems version.
 
 By default B<Net::Interface> functions and methods return string IPv6
 addresses and MAC addresses in uppercase.  To change that to lowercase:
@@ -281,7 +282,7 @@ repeat calls to I<new>.
 =head1 SYMBOLS
 
 B<Net::Interface> provide a large number of network interface symbols
-with a module generated on its build host. These sybols include all of the
+with a module generated on its build host. These symbols include all of the
 available AF_xxxx, PF_xxx, IFF_xxx symbols and many more. For a detailed
 list of all of these symbols, see L<Net::Interface::NetSymbols>.
 

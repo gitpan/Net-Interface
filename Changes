@@ -1,5 +1,16 @@
 Revision history for Perl extension Net::Interface.
 
+1.002  Mon Feb 23 13:16:27 PST 2009
+	Updated documentation in Developer.pm
+
+	Add array to note and ignore troublesome unused symbols 
+	in inst/netsymbols.pl v0.06
+
+	For systems that do not support SIOCGIFINDEX, extract
+	interface index from AF_PACKET or AF_LINK record
+
+	Adjust constructor syntax for picky Sunos CC on certain systems
+
 1.001  Sat Feb 21 18:30:07 PST 2009
 	BETA 1 release.
 

@@ -2,7 +2,7 @@ package Net::Interface::Developer;
 
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 =pod
 
@@ -14,7 +14,7 @@ Net::Interface::Developer api, notes, hints
 
 This contains development notes and API documentation for the
 Net::Interface module. It is hoped that others will help fill in the missing pieces
-for OS's and adress families that are currently unsupported.
+for OS's and address families that are currently unsupported.
 
 =head1 ARCHITECTURE
 
@@ -35,7 +35,7 @@ Net::Interface is built in 5 layers, listed below from the base up.
 
 =head2 description:	files		code
 
-=head2 1) AF_xxx families: ni_af_xxx.c	(C)
+=head2 1) AF_xxx families: ni_af_inetcommon.c	(C)
 
 Code modules for AF families. Currently supported are AF_INET, AF_INET6. There
 is partial support for AF_LINK and AF_PACKET for retrieval of MAC address
@@ -62,7 +62,7 @@ Provides support for retrieval of both ipV4 and ipV6 information.
 C<in6_ifreq> uses C<struct sockaddr_storage> rather than the smaller
 C<struct sockaddr> that is used in C<ifreq>. This code modules support
 variants of the BSD operating system and a few others. ni_in6_ifreq makes
-use of calls to ni_af_inet.c and ni_af_inet6.c
+use of calls to ni_af_inetcommon.c
 
 =item * C<lifreq> ni_lifreq.c
 
@@ -192,6 +192,8 @@ expected that future developement will modify or add to function access.
   # to call ni_linuxproc ifreq emulation
   print "\nglxp\n";   d_ni_linuxproc Net::Interface();
 
+See: test.pl.developer
+
 =head1 DEVELOPER API DESCRIPTION
 
 If you have gotten this far, it is time to read some of the code. AF_familes
@@ -201,30 +203,15 @@ components are described in C<ni_func.h> near the bottom and in C<ni_util.c>
 in the section labeled B<constructor registration> the essence of which is
 described here.
 
-  struct ni_af_flavor * ni_af_get(int af);
-
-  nafp = ni_af_get(AF_INET);
-
-Returns a pointer C<nafp> to the structure for a particular address family
-AF_INET, AF_INET6 and hopefully others as support is added for them. If a
-family is unsupported on a particular architecture a NULL is returned.
-
-  struct ni_af_flavor {
-    int                         ni_af_family;	 AF_INET, etc...
-    int32_t                     (*af_get_any)	 get ioctl(SIOCxxx)
-    int                         (*af_getifaddrs) solo ifaddrs struct
-    struct ni_af_flavor *       ni_aff_next;
-  };
-
-B<and....>
-
   struct ni_ifconf_flavor * ni_ifcf_get(enum ni_FLAVOR type)
+  struct ni_ifconf_flavor * ni_safe_ifcf_get(enum ni_FLAVOR type);
 
   nifp = ni_ifcf_get(NI_IFREQ);
 
 Returns a pointer C<nifp> to the structure for a particular flavor of
-B<ifreq>. If a flavor is unsupported on a particular architecture the NULL
-is returned. Currently supported flavors are:
+B<ifreq>. If a flavor is unsupported on a particular architecture a NULL
+is returned by the first invocation and NI_IFREQ by the second. 
+Currently supported flavors are:
 
   enum ni_FLAVOR {
         NI_NULL,	reserved for the getifaddrs base system call
@@ -237,6 +224,24 @@ is returned. Currently supported flavors are:
   struct ni_ifconf_flavor {
     enum ni_FLAVOR              ni_type;
     int                         (*gifaddrs)
+    int                         siocgifindex;  
+    int                         siocsifaddr;   
+    int                         siocgifaddr;   
+    int                         siocdifaddr;   
+    int                         siocaifaddr;   
+    int                         siocsifdstaddr;
+    int                         siocgifdstaddr;
+    int                         siocsifflags;
+    int                         siocgifflags;
+    int                         siocsifmtu;
+    int                         siocgifmtu;
+    int                         siocsifbrdaddr;
+    int                         siocgifbrdaddr;
+    int                         siocsifnetmask;
+    int                         siocgifnetmask;
+    int                         siocsifmetric;
+    int                         siocgifmetric;
+    int                         ifr_offset;
     void                        (*fifaddrs)	 howto free ifaddrs
     int                         (*refreshifr)	 howto refresh ifreq
     void *                      (*getifreqs)	 howto get ifreq
@@ -298,8 +303,9 @@ enumerated above on success.
 =item uint32_t ni_ipv6addr_gettype(struct in6_addr * in6p)
 
 Extracts information about the type of ipV6 address. The returned value may
-be passed to the NEXT function call to print to print.
+be passed to the NEXT function call to print.
 
+=item 
 =item int ni_lx_map2scope(int lscope)
 
 This function maps I<Linux> style scope bits to their RFC-2373 equivalent.

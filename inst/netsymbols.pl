@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # #####################################################################	#
-# netsymbols.pl	version 0.05	2/10/09, michael@bizsystems.com		#
+# netsymbols.pl	version 0.06	2/23/09, michael@bizsystems.com		#
 #									#
 #									#
 #     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	#
@@ -41,6 +41,12 @@
 use Config;
 #use diagnostics;
 ### generate AF/PF families 
+
+# list of troublesome symbols to ignore
+my @donotuse = qw(
+	AF_NETGRAPH
+	PF_NETGRAPH
+);
 
 my(@slurp,%slurped,%fam,%unique);
 my $endv = 0;			# maximum value found in defines
@@ -122,7 +128,7 @@ sub extradef {
       last;
     }
   }
-print STDERR qq|\n\tadvisory warning\n"@syn"\n\tnot defined\n| unless defined $x;
+#print STDERR qq|\n\tadvisory warning\n"@syn"\n\tnot defined\n| unless defined $x;
   return unless defined $x;
 
 # define all undefined synonyms
@@ -161,6 +167,14 @@ slurp('netinet/in_var.h') if -e '/usr/include/netinet/in_var.h';
 fill(\%ifs,'','^#\s*define\s+(IF[^\s]+)\s+([^\s]+)','(IF[^\s]+)\s*\=\s*([^\s,]+)');
 fill(\%ifs,'','^#\s*define\s+(IN6_IF[^\s]+)\s+([^\s]+)','(IN6_IF[^\s]+)\s*\=\s*([^\s,]+)');
 
+# dispose of troublesome symbols
+my %ru = reverse %unique;
+foreach my $symhsh (\%ifs,\%fam,\%ru) {
+  foreach(@donotuse) {
+    delete $symhsh->{$_} if exists $symhsh->{$_};
+  }
+}
+%unique = reverse %ru;
 
 # fill done, bump max value
 ++$endv;

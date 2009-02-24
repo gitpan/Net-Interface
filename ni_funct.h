@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_funct.h	version 0.01 1-12-09					*
+ * ni_funct.h	version 0.02 2-23-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -382,12 +382,6 @@ ni_linux_scope2txt(u_int32_t flags);
 u_int32_t
 ni_in6_classify(unsigned char * s6_bytes);
 
-/* ****************************************************	*
- *	constructor for various flavor registrations	*
- * ****************************************************	*/
-
-#define ni_constructor void __attribute__ ((constructor))
- 
 /* ****************************************************	*
  *	support for variants of ifreq			*
  * ****************************************************	*/

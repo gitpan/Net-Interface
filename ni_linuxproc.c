@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_linuxproc.c	version 0.01 1-12-09				*
+ * ni_linuxproc.c	version 0.02 2-23-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -372,7 +372,7 @@ static struct ni_ifconf_flavor ni_flavor_linuxproc = {
     .developer		= ni_flav_linuxproc_developer,
 };
 
-ni_constructor
+void __attribute__((constructor))
 ni_linuxproc_ctor(void)
 {
     ni_ifcf_register(&ni_flavor_linuxproc);

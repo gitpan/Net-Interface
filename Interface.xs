@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * Interface.xs		version 1.01	2-7-09				*
+ * Interface.xs		version 1.02	2-23-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -131,7 +131,7 @@ af_common(HV * hface, HV * family, struct ifaddrs * ifap, int offset, int addrsz
 	struct nifreq ifr;
 	char afk[16], * addrptr;
 	const char * addr = "addr", * netmask = "netm", * dstaddr = "dsta";
-	const char * flags = "flag", * size = "size", * mtu = "mtui", * metric = "metk", * index = "indx";
+	const char * flags = "flag", * size = "size", * mtu = "mtui", * metric = "metk", * ifindex = "indx";
 	int i;
 	AV * anyaddr;
 	u_int64_t fgs;
@@ -159,22 +159,23 @@ af_common(HV * hface, HV * family, struct ifaddrs * ifap, int offset, int addrsz
 			return -1;
 
 		    strlcpy(ifr.ni_ifr_name,ifap->ifa_name,IFNAMSIZ);
+/*	save MTU	*/
 		    if ((i = ni_get_any(*fd,nifp->siocgifmtu,&ifr)) < 0)
 			i = 0;
-/*	save MTU	*/
 		    hv_store(hface,mtu,niKEYsz,newSViv(i),0);
+/*	save METRIC	*/
 		    if ((i = ni_get_any(*fd,nifp->siocgifmetric,&ifr)) < 0)
 			i = 0;
-/*	save METRIC	*/
 		    hv_store(hface,metric,niKEYsz,newSViv(i),0);
-		    if ((i = ni_get_any(*fd,nifp->siocgifindex,&ifr)) < 0)
-			i = -1;
-/*	save INDEX	*/
-		    hv_store(hface,index,niKEYsz,newSViv(i),0);
+/*	save INDEX if defined for this platform	*/
+		    if (nifp->siocgifindex != 0) {
+			if ((i = ni_get_any(*fd,nifp->siocgifindex,&ifr)) < 0)
+			    i = -1;
+			hv_store(hface,ifindex,niKEYsz,newSViv(i),0);
+		    }
 		    if ((*fd = ni_clos_reopn_dgrm(*fd,af)) < 0)
 			return -1;
 		}
-
 
 /*	if the address arrays are populated, get pointer	*/
 		if (hv_exists(hface,afk,afk_len(af,afk)))
@@ -227,7 +228,7 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 	int flavor, forcflavor, i, fd = -1, n = 1, ic, need_mac_addr = 1;
 	u_int af;
 	struct ifaddrs * ifap, * ifapbase = NULL;
-	const char * mac = "maci", * name = "name", * args = "args", * flags = "flag", * flav = "flav";
+	const char * mac = "maci", * name = "name", * args = "args", * flags = "flag", * flav = "flav", * ifindex = "indx";
 	char nbuf[IFNAMSIZ], afk[16];
 	u_char * macp;
 	struct nifreq ifr;
@@ -373,6 +374,8 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 			need_mac_addr = 0;
 			hv_store(hface,mac,niKEYsz,newSVpvn((char *)macp,6),0);
 		    }
+		    if (sadl->sdl_index != 0 && (! hv_exists(hface,ifindex,niKEYsz)))
+			hv_store(hface,ifindex,niKEYsz,newSViv(sadl->sdl_index),0);
 		}
 	    }
 
@@ -386,6 +389,8 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 			need_mac_addr = 0;
 			hv_store(hface,mac,niKEYsz,newSVpvn((char *)macp,6),0);
 		    }
+		    if (sall->sll_ifindex != 0 && (! hv_exists(hface,ifindex,niKEYsz)))
+			hv_store(hface,ifindex,niKEYsz,newSViv(sall->sll_ifindex),0);
 		}
 	    }
 

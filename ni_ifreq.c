@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_ifreq.c	version 0.01	1-15-09					*
+ * ni_ifreq.c	version 0.02	2-23-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -209,7 +209,11 @@ for(j = 0; j < ifc.ifc_len; j += inc) {
 
 static struct ni_ifconf_flavor ni_flavor_ifreq = {
     .ni_type		= NI_IFREQ,
+#ifdef SIOCGIFINDEX
     .siocgifindex	= SIOCGIFINDEX,
+#else
+    .siocgifindex	= 0,
+#endif
     .siocsifaddr	= SIOCSIFADDR,
     .siocgifaddr	= SIOCGIFADDR,
 #ifdef SIOCDIFADDR
@@ -242,7 +246,7 @@ static struct ni_ifconf_flavor ni_flavor_ifreq = {
     .developer		= ni_flav_ifreq_developer,
 };
 
-ni_constructor
+void __attribute__((constructor))
 ni_ifreq_ctor(void)
 {
     ni_ifcf_register(&ni_flavor_ifreq);

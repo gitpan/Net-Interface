@@ -55,7 +55,9 @@ ni_get_any(int fd, int cmd, void * ifr)
     case SIOCGIFMTU :
     case SIOCGIFMETRIC :
     case SIOCGIFFLAGS :
+#ifdef SIOCGIFINDEX
     case SIOCGIFINDEX :
+#endif
     case SIOCGIFADDR :
     case SIOCGIFNETMASK :
     case SIOCGIFBRDADDR :
@@ -72,7 +74,9 @@ ni_get_any(int fd, int cmd, void * ifr)
     case SIOCGIFFLAGS :
     case SIOCGIFMETRIC :
     case SIOCGIFMTU :
+#ifdef SIOCGIFINDEX
     case SIOCGIFINDEX :
+#endif
 	return ((struct nifreq *)ifr)->ni_int;
     }
     return 0;
