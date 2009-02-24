@@ -136,6 +136,7 @@ print Dumper($sym);
 
 #print "\nbase\n"; gifaddrs_base Net::Interface();
 
+# put interface name in the parens
 Net::Interface::macstuff();
 
 

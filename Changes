@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Interface.
 
+1.003  Tue Feb 24 15:16:54 PST 2009
+	replace definitions missing in MAC OSX with def's from local 
+	distro header file for ni_in6_ifreq.c
+
 1.002  Mon Feb 23 13:16:27 PST 2009
 	Updated documentation in Developer.pm
 

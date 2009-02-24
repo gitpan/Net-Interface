@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_in6_ifreq.c	version 0.03	2-23-09				*
+ * ni_in6_ifreq.c	version 0.04	2-24-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -283,18 +283,18 @@ ni_flav_in6_ifreq_developer(void * ifcee)
                 flags = 0;
             }
             else
-                printf("flags=%0x<",flags);
+                printf("flags6=%0x<",flags);
 
-            if (flags & IFF_UP)
+/*            if (flags & IFF_UP)
                 printf("UP ");
             else
 	        printf("DOWN ");
+ */
             n = sizeof(ni_iff_tabIN6) / sizeof(ni_iff_t);
             for (i=0;i<n;i++) {
                 if (flags & ni_iff_tabIN6[i].iff_val)
                     printf("%s ",ni_iff_tabIN6[i].iff_nam);
             }
-
             if (flags == 0)
                 printf(" ");
             printf("\b> ");
@@ -302,16 +302,16 @@ ni_flav_in6_ifreq_developer(void * ifcee)
             if (scopeid) {
                 scopeid &= 0xfu;
                 printf("scopeid 0x%x ",scopeid);
-                if (scopeid == __IPV6_ADDR_SCOPE_NODELOCAL)
-		    printf("NodeLocal ");
-                else if (scopeid == __IPV6_ADDR_SCOPE_INTFACELOCAL)
+                if (scopeid == RFC2373_NODELOCAL)
 		    printf("IfaceLocal ");
-                else if (scopeid == __IPV6_ADDR_SCOPE_LINKLOCAL)
+                else if (scopeid == RFC2373_LINKLOCAL)
 		    printf("LinkLocal ");
-                else if (scopeid == __IPV6_ADDR_SCOPE_SITELOCAL)
+                else if (scopeid == RFC2373_SITELOCAL)
 		    printf("SiteLocal ");
-                else if (scopeid == __IPV6_ADDR_SCOPE_GLOBAL)
+                else if (scopeid == RFC2373_GLOBAL)
 		    printf("Global ");
+		else if (scopeid == RFC2373_ORGLOCAL)
+		    printf("OrgLocal ");
             }
 
             if (ioctl(fd,SIOCGIFMETRIC,ifr) < 0)
