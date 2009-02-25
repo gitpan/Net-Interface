@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_in6_ifreq.c	version 0.04	2-24-09				*
+ * ni_in6_ifreq.c	version 0.05	2-25-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -177,7 +177,7 @@ ni_flav_in6_ifreq_developer(void * ifcee)
         macp = NULL;
 /* BSD pretty much assumes that SA_LEN is defined, if not fudge it	*/
 
-        inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,ifr->ni_saddr,sizeof(struct ifreq));
+        inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,(&ifr->ni_saddr),sizeof(struct ifreq));
 	af = ifr->ni_saddr.sa_family;
 
 	printf("%s\t",ifr->ni_ifr_name);

@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_af_inetcommon.c	version 0.01 2-18-09				*
+ * ni_af_inetcommon.c	version 0.02 2-25-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -49,7 +49,7 @@ _ni_get_ifaddrs(int fd, struct ifaddrs * thisif, struct ni_ifconf_flavor * nifp,
 
     if (ioctl(fd,nifp->siocgifnetmask,ifr) != -1) {
 	if ((thisif->ifa_netmask = ni_memdup(&(ifr->ni_saddr),
-				    SA_LEN(ifr->ni_saddr))) == NULL)
+				    SA_LEN((&ifr->ni_saddr)))) == NULL)
 	    return -1;
     }
     if (thisif->ifa_flags & (IFF_POINTOPOINT | IFF_BROADCAST)) {
@@ -60,7 +60,7 @@ _ni_get_ifaddrs(int fd, struct ifaddrs * thisif, struct ni_ifconf_flavor * nifp,
 
 	if (ioctl(fd,cmd,ifr) != -1) {
 	    if ((thisif->ifa_dstaddr = ni_memdup(&(ifr->ni_saddr),
-					SA_LEN(ifr->ni_saddr))) == NULL)
+					SA_LEN((&ifr->ni_saddr)))) == NULL)
 		return -1;
 	}
     }
@@ -119,7 +119,7 @@ _ni_get_ifaddrs6(int fd, struct ifaddrs * thisif, struct ni_ifconf_flavor * nifp
 
     if (ioctl(fd,nifp->siocgifnetmask,ifr) != -1) {
 	if ((thisif->ifa_netmask = ni_memdup(&(ifr->ni_saddr),
-				    SA_LEN(ifr->ni_saddr))) == NULL) {
+				    SA_LEN((&ifr->ni_saddr)))) == NULL) {
 	    return -1;
        }
     }
@@ -142,7 +142,7 @@ _ni_get_ifaddrs6(int fd, struct ifaddrs * thisif, struct ni_ifconf_flavor * nifp
  *
  *	if (ioctl(fd,cmd,ifr) != -1) {
  *	    if ((thisif->ifa_dstaddr = ni_memdup(&(ifr->ni_saddr),
- *					SA_LEN(ifr->ni_saddr))) == NULL)
+ *					SA_LEN((&ifr->ni_saddr)))) == NULL)
  *		return -1;
  *	}
  *   }
@@ -167,7 +167,7 @@ ni_refresh_ifreq(int fd, struct ifconf * ifc, void ** oifr, void ** olifr, struc
     int af, inc;
 /*    struct sockaddr_dl * sadl, * csadl;	*/
 
-    inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)*oifr,((struct nifreq *)*oifr)->ni_saddr,sizeof(struct ifreq));
+    inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)*oifr,(&((struct nifreq *)*oifr)->ni_saddr),sizeof(struct ifreq));
     memcpy(cifr,*oifr,inc);			/* copy the current ifreq struct */
     if (ifc->ifc_req != NULL)
 	free(ifc->ifc_req);			/* free the old buffer	*/
@@ -177,7 +177,7 @@ ni_refresh_ifreq(int fd, struct ifconf * ifc, void ** oifr, void ** olifr, struc
     ifr = (struct nifreq *)(ifc->ifc_req);
     lifr = (struct nifreq *)&(ifc->ifc_buf[ifc->ifc_len]);
     for (; ifr < lifr; ifr = (struct nifreq *)(((char *)ifr) + inc)) {
-        inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,ifr->ni_saddr,sizeof(struct ifreq));
+        inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,(&ifr->ni_saddr),sizeof(struct ifreq));
         if (strncmp(ifr->ni_ifr_name,cifr->ni_ifr_name,IFNAMSIZ))
             continue;
         if ((af = ifr->ni_saddr.sa_family) != cifr->ni_saddr.sa_family)
@@ -244,7 +244,7 @@ nifreq_gifaddrs(struct ifaddrs **ifap, struct ni_ifconf_flavor * nifp)
     lifr = (struct nifreq *)&(ifc.ifc_buf[ifc.ifc_len]);
 
     while(ifr < lifr) {
-	inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,ifr->ni_saddr,sizeof(struct ifreq));
+	inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,(&ifr->ni_saddr),sizeof(struct ifreq));
 
 	if ((thisif = calloc(1, sizeof(struct ifaddrs))) == NULL) {
 	    errno = ENOMEM;
@@ -262,7 +262,7 @@ nifreq_gifaddrs(struct ifaddrs **ifap, struct ni_ifconf_flavor * nifp)
 
 	af = ifr->ni_saddr.sa_family;
 	if ((thisif->ifa_addr = ni_memdup(&(ifr->ni_saddr),
-				    SA_LEN(ifr->ni_saddr))) == NULL)
+				    SA_LEN((&ifr->ni_saddr)))) == NULL)
 	    goto error_out;
 
 	if (af == AF_INET) {

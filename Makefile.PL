@@ -13,7 +13,7 @@ my $wish_libs = '';
 
 # 'C' files that are not objexts
 #
-my $include = ' ni_IFF_inc.c ni_XStabs_inc.c miniSocket.inc ';
+my $include = ' ni_IFF_inc.c ni_XStabs_inc.c miniSocketXS.c ';
 
 # objecct files
 #
@@ -47,8 +47,8 @@ my %makeparms = (
 	OBJECT		=> $objects,
 	dist		=> {'COMPRESS'	=> 'gzip', 
 		    'SUFFIX'	=> 'gz'},
-	clean		=> { FILES	=> q|*~ *.bs *.o tmp* localperl.h auto* *.inc|. 
-					   q|lib/Net/Interface/NetSymbols.pm|},
+	clean		=> { FILES	=> q|*~ *.bs *.o tmp* localperl.h auto* *.inc |. 
+				q|lib/Net/Interface/NetSymbols.pm ni_IFF_inc.c ni_XStabs_inc.c |},
 	realclean	=> { FILES	=> "config.h config.log config.status"},
 	depend		=> {$cfile	=> $depend,
 	},

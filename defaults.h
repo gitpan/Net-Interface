@@ -276,8 +276,10 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
+#ifndef HAVE_MALLOC_IN_STDLIB
+# ifdef HAVE_MALLOC_H
+# include <malloc.h>
+# endif
 #endif
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>

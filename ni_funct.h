@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_funct.h	version 0.02 2-23-09					*
+ * ni_funct.h	version 0.03 2-25-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*

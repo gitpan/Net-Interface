@@ -43,6 +43,26 @@ AC_DEFUN([AX_CHECK_INCLUDE],[
 #include "defaults.h"
 ])])
 
+# AX_IN_STDLIB(lowercase_funcname, UPPERCASE_FUNCNAME)
+# ---------------------------------------------------------
+# checks if the function is present in the netinet/in.h file
+# and sets SIZEOF_SOCKFUNC if found
+AC_DEFUN([AX_IN_STDLIB],[
+AH_TEMPLATE([HAVE_$2_IN_STDLIB],[Define size of $1])
+AC_MSG_CHECKING([for $2 in stdlib.h])
+AC_COMPILE_IFELSE([
+#include <stdlib.h>
+int   
+main()
+{
+    void * mem = malloc(8192);
+    return 1;
+}],
+AC_MSG_RESULT([yes])
+AC_DEFINE_UNQUOTED([HAVE_$2_IN_STDLIB],[1],[$2 in <stdlib.h>]),
+AC_MSG_RESULT([not defined])
+)])
+
 AC_CONFIG_HEADER([config.h])
 
 AC_CANONICAL_HOST
@@ -200,6 +220,7 @@ AC_PROG_GCC_TRADITIONAL
 
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
+AX_IN_STDLIB([malloc],[MALLOC]);
 
 # Checks for header files.
 AX_CHECK_INCLUDE([asm/types.h],[ASM_TYPES_H])

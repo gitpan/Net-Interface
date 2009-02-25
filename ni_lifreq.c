@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_lifreq.c	version 0.03 2-23-09					*
+ * ni_lifreq.c	version 0.04 2-25-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -65,7 +65,7 @@ _ni_get_ifaddrs(int fd, struct ifaddrs * thisif, struct lifreq * ifr,...)
 
     if (ioctl(fd,SIOCGLIFNETMASK,ifr) != -1) {
 	if ((thisif->ifa_netmask = ni_memdup(&(ifr->lifr_addr),
-				    SA_LEN(*((struct sockaddr *)&ifr->lifr_addr)))) == NULL)
+				    SA_LEN(((struct sockaddr *)&ifr->lifr_addr)))) == NULL)
 	    return -1;
     }
     if (thisif->ifa_flags & (IFF_POINTOPOINT | IFF_BROADCAST)) {
@@ -76,7 +76,7 @@ _ni_get_ifaddrs(int fd, struct ifaddrs * thisif, struct lifreq * ifr,...)
 
 	if (ioctl(fd,cmd,ifr) != -1) {
 	    if ((thisif->ifa_dstaddr = ni_memdup(&(ifr->lifr_addr),
-					SA_LEN(*((struct sockaddr *)&ifr->lifr_addr)))) == NULL)
+					SA_LEN(((struct sockaddr *)&ifr->lifr_addr)))) == NULL)
 		return -1;
 	}
     }
@@ -122,7 +122,7 @@ ni_lifreq_gifaddrs(struct ifaddrs **ifap, struct ni_ifconf_flavor * nifp)
 
 	af = ifr->lifr_addr.ss_family;
 	if ((thisif->ifa_addr = ni_memdup(&(ifr->lifr_addr),
-				    SA_LEN(*((struct sockaddr *)&ifr->lifr_addr)))) == NULL)
+				    SA_LEN(((struct sockaddr *)&ifr->lifr_addr)))) == NULL)
 	    goto error_out;
 
 	if (af == AF_INET) {

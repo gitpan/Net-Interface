@@ -103,6 +103,9 @@
 /* define available include file */
 #undef HAVE_MALLOC_H
 
+/* MALLOC in <stdlib.h> */
+#undef HAVE_MALLOC_IN_STDLIB
+
 /* Define to 1 if you have the `memcmp' function. */
 #undef HAVE_MEMCMP
 

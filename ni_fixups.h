@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_fixups.h	version 0.01 1-12-09					*
+ * ni_fixups.h	version 0.02 2-25-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -162,9 +162,9 @@ __libc_sa_len (const sa_family_t af)
    }
    return 0;
 }
-# define SA_LEN(sa) __libc_sa_len((sa).sa_family)
+# define SA_LEN(sa) __libc_sa_len((sa)->sa_family)
 # else
-# define SA_LEN(sa) ((sa).sa_len)
+# define SA_LEN(sa) ((sa)->sa_len)
 # endif
 #endif
 
@@ -176,7 +176,7 @@ __libc_sa_len (const sa_family_t af)
 #ifdef _SIZEOF_ADDR_IFREQ
 
 int
-ni_SIZEOF_ADDR_IFREQ(struct ifreq * ifrp,struct sockaddr sa,int size);
+ni_SIZEOF_ADDR_IFREQ(struct ifreq * ifrp,struct sockaddr * sa,int size);
 
 #else
 #define ni_SIZEOF_ADDR_IFREQ(ifr,sa,size) \

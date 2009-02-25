@@ -73,7 +73,7 @@ ni_clos_reopn_dgrm(int fd, u_int af)
 
 #ifdef _SIZEOF_ADDR_IFREQ
 int
-ni_SIZEOF_ADDR_IFREQ(struct ifreq * ifrp,struct sockaddr sa,int size)
+ni_SIZEOF_ADDR_IFREQ(struct ifreq * ifrp,struct sockaddr * sa,int size)
 {
     struct ifreq ifr;
     

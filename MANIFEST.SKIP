@@ -19,6 +19,7 @@ lib/Net/Interface/NetSymbols.pm
 netsymbolC.inc
 netsymbolXS.inc
 ni_XStabs_inc.c
+ni_IFF_inc.c
 ni_addertype.c
 N*\.\d+\.tar\.gz$
 ~$

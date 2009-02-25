@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::Interface.
 
+1.004  Wed Feb 25 15:46:20 PST 2009
+	Remove Makefile.pl generated "C" files from MANIFEST
+	Rename miniSocket so it is not deleted by make clean
+
+	Add configure test to check for MALLOC in stdlib so 
+	obsolete malloc.h file is not included
+
+	Correct definition of SA_LEN for systems that don't have it
+	Adjust code for changed definition.
+
 1.003  Tue Feb 24 15:16:54 PST 2009
 	replace definitions missing in MAC OSX with def's from local 
 	distro header file for ni_in6_ifreq.c

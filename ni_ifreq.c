@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_ifreq.c	version 0.02	2-23-09					*
+ * ni_ifreq.c	version 0.03	2-25-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -139,7 +139,7 @@ ni_flav_ifreq_developer(void * ifcee)
 /*    while (ifr < lifr) { */
 for(j = 0; j < ifc.ifc_len; j += inc) {
 	macp = NULL;
-	inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,ifr->ni_saddr,sizeof(struct ifreq));
+	inc = ni_SIZEOF_ADDR_IFREQ((struct ifreq *)ifr,(&ifr->ni_saddr),sizeof(struct ifreq));
 	af = ifr->ni_saddr.sa_family;
 	printf("%s\t",ifr->ni_ifr_name);
 	

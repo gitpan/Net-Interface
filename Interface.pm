@@ -44,7 +44,7 @@ $EXPORT_TAGS{inet} = [qw(
 	inet_ntop
 )];
 
-$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.3 $ =~ /\d+/g) };
+$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.4 $ =~ /\d+/g) };
 
 bootstrap Net::Interface $VERSION;
 
@@ -1077,7 +1077,7 @@ Interface.xs. The copyright (same as Perl itself) is include in the file.
 
     file:	       functions:
 
-  miniSocket.inc  inet_aton, inet_ntoa
+  miniSocketXS.c  inet_aton, inet_ntoa
 
 inet_aton, inet_ntoa are from the perl-5.8.0 release by Larry Wall, copyright
 1989-2002. inet_aton, inet_ntoa code is current through perl-5.9.3 release.

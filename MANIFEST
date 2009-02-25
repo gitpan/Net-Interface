@@ -24,7 +24,7 @@ hints/solaris_2.pl
 inet_aton.c
 inst/netsymbols.pl
 install-sh
-miniSocket.inc
+miniSocketXS.c
 localconf.h
 ni_fallbackhwaddr.c
 ni_funct.h
@@ -39,7 +39,6 @@ ni_get_set.c
 ni_strlcpy.c
 ni_strlcpy.h
 ni_util.c
-ni_IFF_inc.c
 ni_linuxproc.c
 ni_SMI-NUMBERS.c
 ppport.h

@@ -500,7 +500,7 @@ get_first_address(SV * ref, char * key, int sixonly)
 
 MODULE = Net::Interface	PACKAGE = Net::Interface PREFIX = NIP_
 
-INCLUDE: miniSocket.inc
+INCLUDE: miniSocketXS.c
 
 
 void
