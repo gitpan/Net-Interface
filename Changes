@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Interface.
 
+1.008  Sun Mar  1 15:22:06 PST 2009
+	Add check for improperly truncated ifaddrs entry in 
+	Interfaces.xs / getheifs
+
 1.007  Sun Mar  1 10:47:44 PST 2009
 	Pause seems to think v1.006 is already there???
 	increment the serial number

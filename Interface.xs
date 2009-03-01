@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * Interface.xs		version 1.03	2-27-09				*
+ * Interface.xs		version 1.04	2-27-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -340,6 +340,10 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 		nl = nlbase + n -1;
 		bzero(nl,sizeof(struct ni_lnk_names));
 	    }
+
+/* check for improperly truncated entry		*/
+	    if (ifap->ifa_addr == NULL)
+		goto iferror2;
 /*
  * only store 'ifa_flags' for families where we store the address since
  * we don't know if 'ifa_flags' is consistently populated for link/packet
