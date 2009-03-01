@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::Interface.
 
-1.006
+1.007  Sun Mar  1 10:47:44 PST 2009
+	Pause seems to think v1.006 is already there???
+	increment the serial number
+
+1.006  Sun Mar  1 10:11:01 PST 2009
 	update inst/netsymbols.pl to only keep and process
 	AF/PF family symbols needed for this distribution
 

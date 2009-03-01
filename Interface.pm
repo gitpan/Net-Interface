@@ -44,7 +44,7 @@ $EXPORT_TAGS{inet} = [qw(
 	inet_ntop
 )];
 
-$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.6 $ =~ /\d+/g) };
+$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.7 $ =~ /\d+/g) };
 
 bootstrap Net::Interface $VERSION;
 
