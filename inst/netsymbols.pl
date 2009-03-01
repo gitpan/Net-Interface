@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # #####################################################################	#
-# netsymbols.pl	version 0.07	2/26/09, michael@bizsystems.com		#
+# netsymbols.pl	version 0.08	2/28/09, michael@bizsystems.com		#
 #									#
 #									#
 #     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	#
@@ -47,6 +47,54 @@ my @donotuse = qw(
 	AF_NETGRAPH
 	PF_NETGRAPH
 );
+
+# list of wanted AF/PF symbols, ignore the rest
+# this list should reflect the SOCKADDR's present
+# in the header file "ni_fixups.h" plus a few symbols
+#
+my @wantafsyms = qw(
+	AF_UNSPEC
+	AF_INET
+	AF_INET6
+	AF_LOCAL
+	AF_FILE
+	AF_UNIX
+	AF_MAX
+	AF_PACKET
+	AF_ROUTE
+	AF_APPLETALK
+	AF_ASH
+	AF_X25
+	AF_ECONET
+	AF_IPX
+	AF_ROSE
+	AF_LINK
+	AF_ISO
+	AF_NUTSS
+	AF_AX25
+	AF_DECnet
+	PF_UNSPEC
+	PF_INET
+	PF_INET6
+	PF_LOCAL
+	PF_FILE
+	PF_UNIX
+	PF_MAX
+	PF_PACKET
+	PF_ROUTE
+	PF_APPLETALK
+	PF_ASH
+	PF_X25
+	PF_ECONET
+	PF_IPX
+	PF_ROSE
+	PF_LINK
+	PF_ISO
+	PF_NUTSS
+	PF_AX25
+	PF_DECnet
+);
+
 
 my(@slurp,%slurped,%fam,%unique);
 my $endv = 0;			# maximum value found in defines
@@ -170,8 +218,17 @@ fill(\%ifs,'','^#\s*define\s+(IN6_IF[^\s]+)\s+([^\s]+)','(IN6_IF[^\s]+)\s*\=\s*(
 # dispose of troublesome symbols
 my %ru = reverse %unique;
 foreach my $symhsh (\%ifs,\%fam,\%ru) {
-  foreach(@donotuse) {
+  foreach(@donotuse) {		# remove the ones that cause trouble
     delete $symhsh->{$_} if exists $symhsh->{$_};
+  }
+}
+foreach my $symhsh(\%fam) {
+  my @allsyms = keys %$symhsh;
+  foreach my $havsym (@allsyms) {
+    unless (grep {/$havsym/} @wantafsyms) {
+      delete $symhsh->{$havsym};	# delete unneeded symbol here
+      delete $ru{$havsym};		# and in unique hash
+    }
   }
 }
 %unique = reverse %ru;
