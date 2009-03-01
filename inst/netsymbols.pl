@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # #####################################################################	#
-# netsymbols.pl	version 0.06	2/23/09, michael@bizsystems.com		#
+# netsymbols.pl	version 0.07	2/26/09, michael@bizsystems.com		#
 #									#
 #									#
 #     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	#
@@ -207,7 +207,7 @@ extradef(*NFc,\%fam,qw( PF_LOCAL PF_UNIX PF_FILE AF_LOCAL AF_FILE AF_UNIX )); # 
 extradef(*NFc,\%fam,qw( PF_MAX AF_MAX ));
 extradef(*NFc,\%fam,qw( AF_PACKET PF_PACKET AF_ROUTE PF_ROUTE ));
 extradef(*NFc,\%fam,qw( AF_ISO PF_ISO AF_BRIDGE PF_BRIDGE ));
-extradef(*NFc,\%fam,qw( AF_NS PF_NS AF_NUTSS PF_NUTSS AF_ATM PF_ATM ));
+# this one is not correct...  extradef(*NFc,\%fam,qw( AF_NS PF_NS AF_NUTSS PF_NUTSS AF_ATM PF_ATM ));
 
 extradef(*NFc,\%ifs,qw( IFNAMSIZ IF_NAMESIZE ));
 

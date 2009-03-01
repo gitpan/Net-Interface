@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * Interface.xs		version 1.02	2-23-09				*
+ * Interface.xs		version 1.03	2-27-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -227,7 +227,7 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 {
 	int flavor, forcflavor, i, fd = -1, n = 1, ic, need_mac_addr = 1;
 	u_int af;
-	struct ifaddrs * ifap, * ifapbase = NULL;
+	struct ifaddrs * ifap = NULL, * ifapbase = NULL;
 	const char * mac = "maci", * name = "name", * args = "args", * flags = "flag", * flav = "flav", * ifindex = "indx";
 	char nbuf[IFNAMSIZ], afk[16];
 	u_char * macp;
@@ -287,6 +287,10 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 	    goto iferror1;
 	else if (flavor == 0)
 	    forcflavor = NI_IFREQ;
+/* belt and suspenders test for failed fetch of ifaddrs data	*/
+	if (ifap == NULL)		/* there are no addresses to check */
+	    goto iferror1;
+
 	ifapbase = ifap;
 
 /*
@@ -340,7 +344,7 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
  * only store 'ifa_flags' for families where we store the address since
  * we don't know if 'ifa_flags' is consistently populated for link/packet
  */
-	    af = ifap->ifa_addr->sa_family;
+	    af = ((struct sockaddr *)(ifap->ifa_addr))->sa_family;
 /* AF_INET					*/
 	    if (af == AF_INET) {
 		if (af_common(hface,family,ifap,

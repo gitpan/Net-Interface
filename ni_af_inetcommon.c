@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_af_inetcommon.c	version 0.02 2-25-09				*
+ * ni_af_inetcommon.c	version 0.03 2-27-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -296,9 +296,12 @@ nifreq_gifaddrs(struct ifaddrs **ifap, struct ni_ifconf_flavor * nifp)
 
   error_out:
     ret = errno;	/* preserve errno	*/
+    if (ret == 0)
+      ret = EPERM;
     free(ifc.ifc_req);
     ni_freeifaddrs(*ifap);
     close(fd);
+    *ifap = NULL;
     errno = ret;
     return -1;
 }

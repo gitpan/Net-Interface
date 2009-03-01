@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Interface.
 
+1.005  Fri Feb 27 13:17:53 PST 2009
+	Remove extradef's in inst/netsymbols.pl for 
+	AF_NS AF_ATM AF_NUTSS since they are not equivalent
+	
+	In Interface.xs, gethifs() initialize ifap to NULL 
+	and check its return value for non-null
+
 1.004  Wed Feb 25 15:46:20 PST 2009
 	Remove Makefile.pl generated "C" files from MANIFEST
 	Rename miniSocket so it is not deleted by make clean
