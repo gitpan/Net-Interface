@@ -7,7 +7,12 @@ if ($^O eq 'MSWin32') {
   exit 0
 }
 
-# extra libs we would like to have that perl does not
+# extra libs we would like to have that perl does not,
+# a SPACE separated list
+#
+# put a test for them in configure.ac and let the script
+# below find and insert them. Make sure and add the necessary
+# paths in %makeparms for INC and LIBS but not the library itself
 #
 my $wish_libs = '';
 
@@ -38,15 +43,16 @@ my $cfile = $& .'.c';
 my %makeparms = (
 	NAME		=> $pkg,
 	VERSION_FROM	=> $module, # finds $VERSION
-	LIBS		=> [],
-	INC		=> '',     # e.g., '-I/usr/include/other' 
 	PREREQ_PM	=> {
-		Test::More		=> 0.62,
-		Socket			=> 0,
+	    Test::More	=> 0.62,
+	    Socket	=> 0,
 	},
+# LIBS list should be a single string to be compatible with script below
+	LIBS		=> '-L/usr/local/lib',
+	INC		=> '-I/usr/local/include',
 	OBJECT		=> $objects,
 	dist		=> {'COMPRESS'	=> 'gzip', 
-		    'SUFFIX'	=> 'gz'},
+		    	    'SUFFIX'	=> 'gz'},
 	clean		=> { FILES	=> q|*~ *.bs *.o tmp* localperl.h auto* *.inc |. 
 				q|lib/Net/Interface/NetSymbols.pm ni_IFF_inc.c ni_XStabs_inc.c |},
 	realclean	=> { FILES	=> "config.h config.log config.status"},
@@ -54,9 +60,37 @@ my %makeparms = (
 	},
 );
 
-unless (-e './config.h') {
-  system('./configure');
+#################################
+# fix up compile and link flags
+#################################
+my %addflags = (
+	ldflags		=> $makeparms{LIBS},
+	lddlflags	=> $makeparms{LIBS},
+	ccflags		=> $makeparms{INC},
+);
+
+my $cfgstrg = '';
+foreach (sort keys %addflags) {
+  my $KEY = uc $_;
+  my $oldstuff = $Config{$_} =~ /(\S.+)/ ? $1 : '';
+  $oldstuff .= ' ' if $oldstuff && $oldstuff !~ / $/;
+#print "$_, $KEY, $oldstuff, $addflags{$_}\n";
+  unless ($oldstuff =~ m|$addflags{$_}|) {
+    $oldstuff .= $addflags{$_};
+  }
+  $cfgstrg .= qq|$KEY="$oldstuff" |;
 }
+
+unless (-e './config.h') {
+  my $command = qq|./configure $cfgstrg|;
+  print $command,"\n";
+  system($command);   
+}
+
+###################################
+# fix up lib list
+###################################
+
 my %LIBS;
 open(F,'config.h') or die "could not open config.h\n";
 foreach(<F>) {
@@ -68,8 +102,10 @@ foreach(<F>) {
 }
 close F;
 
-my $liblist = $Config{libs} . $wish_libs;
-my $link = '';
+my $liblist = $Config{libs} .' '. $wish_libs;
+
+my $link = $makeparms{LIBS} =~ /(\S.+)/ ? $1 : '';
+$link .= ' ' unless $link =~ / $/;
 foreach(keys %LIBS) {
   if ($liblist =~ /$_\b/) {
     $link .= $_ .' ';   
@@ -77,6 +113,10 @@ foreach(keys %LIBS) {
 }
 chop $link;
 $makeparms{LIBS} = [$link];
+
+#######################################
+# find build symbols for OS and threads
+#######################################
 
 open(F,'>localperl.h') or die "could not open localperl.h for write\n";
 print F q|

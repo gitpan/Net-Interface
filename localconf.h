@@ -75,7 +75,7 @@ typedef uint64_t u_int64_t;
 #include <linux/netlink.h>
 #endif
 #ifdef HAVE_LINUX_RTNETLINK_H
-#define HAVE_LINUX_RTNETLINK_H
+#define HAVE_RTNETLINK_H
 #include <linux/rtnetlink.h>
 #endif
 

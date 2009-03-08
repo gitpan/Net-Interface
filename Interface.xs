@@ -990,6 +990,35 @@ _sets(ref,...)
 	RETVAL
 
 
+ # ############################################################	#
+ #	Certain broken Solaris headers cause build		#
+ #	errors with the syntax for constructors.		#
+ #  i.e.							#
+ #	void __attribute__((constructor))			#
+ #	constructor_function () 				#
+ #	{							#
+ #		code....					#
+ #	};							#
+ #								#
+ # line 249: syntax error before or at: (			#
+ # line 251: warning: old-style declaration or incorrect type	#
+ # cc: acomp failed [filename.c]				#
+ # *** Error code 2						#
+ # make: Fatal error: Command failed for target 'filename.o'	#
+ #								#
+ #	The various constructors are declared here and called	#
+ #	during module load as a work-around to this problem	#
+ # ############################################################	#
+ 
+void
+conreg()
+    CODE:
+	ni_ifreq_ctor();
+	ni_in6_ifreq_ctor();
+	ni_lifreq_ctor();
+	ni_linuxproc_ctor();
+
+
 void
 macstuff(dev)
 	SV * dev

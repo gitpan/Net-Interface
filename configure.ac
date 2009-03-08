@@ -45,7 +45,7 @@ AC_DEFUN([AX_CHECK_INCLUDE],[
 
 # AX_IN_STDLIB(lowercase_funcname, UPPERCASE_FUNCNAME)
 # ---------------------------------------------------------
-# checks if the function is present in the netinet/in.h file
+# checks if the function is present in the stdlib.h file
 # and sets SIZEOF_SOCKFUNC if found
 AC_DEFUN([AX_IN_STDLIB],[
 AH_TEMPLATE([HAVE_$2_IN_STDLIB],[Define size of $1])
@@ -445,7 +445,7 @@ AC_SEARCH_LIBS([inet_addr],[socket],[
 
 AH_TEMPLATE([HAVE_PCAP],[Define to 1 if pcap lib is present])
 AC_SEARCH_LIBS([pcap_close],[pcap],[
-	AC_DEFINE([HAVE_PCAP])],[],[-shared])
+	AC_DEFINE([HAVE_PCAP])],[],[$LDDLFLAGS])
 
 AC_CHECK_TYPES([struct ifaddrs, struct ifreq, struct if_laddrreq, struct if_data, struct in6_ifreq, struct if_data, struct ifdevea],[],[],[
 #include "confdefs.h"

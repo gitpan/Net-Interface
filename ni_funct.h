@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_funct.h	version 0.03 2-25-09					*
+ * ni_funct.h	version 0.04 3-7-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -442,10 +442,6 @@ ni_safe_ifcf_get(enum ni_FLAVOR type);
 void
 ni_ifcf_register(struct ni_ifconf_flavor * nip);
 
-/* ****************************************************	*
- *	support for address families			*
- * ****************************************************	*/
- 
 struct ni_af_flavor;
 struct ni_af_flavor {
     int				ni_af_family;
@@ -460,7 +456,30 @@ ni_af_get(int af);
 void
 ni_af_register(struct ni_af_flavor * nafp);
 
-#endif
+/* ************************************************************	*
+ *	Certain broken Solaris headers cause build		*
+ *	errors with the syntax for constructors.		*
+ *  i.e.							*
+ *	void __attribute__((constructor))			*
+ *	constructor_function () 				*
+ *	{							*
+ *		code....					*
+ *	};							*
+ *								*
+ * line 249: syntax error before or at: (			*
+ * line 251: warning: old-style declaration or incorrect type	*
+ * cc: acomp failed [filename.c]				*
+ * *** Error code 2						*
+ * make: Fatal error: Command failed for target 'filename.o'	*
+ *								*
+ *	The various constructors are declared here and called	*
+ *	during module load as a work-around to this problem	*
+ * ************************************************************	*/
+ 
+void ni_ifreq_ctor();
+void ni_in6_ifreq_ctor();
+void ni_lifreq_ctor();
+void ni_linuxproc_ctor();
 
 /* ****************************************************	*
  *	developer support, not for production		*
@@ -471,3 +490,5 @@ ni_developer(enum ni_FLAVOR type);
 
 void
 ni_getifaddrs_dump(int flavor, struct ifaddrs * ifap);
+
+#endif

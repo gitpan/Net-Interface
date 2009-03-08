@@ -44,9 +44,13 @@ $EXPORT_TAGS{inet} = [qw(
 	inet_ntop
 )];
 
-$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.8 $ =~ /\d+/g) };
+$VERSION = do { sprintf "%d.%03d", (q$Revision: 1.9 $ =~ /\d+/g) };
 
 bootstrap Net::Interface $VERSION;
+
+# register the conditionally compiled family modules
+Net::Interface::conreg();
+
 
 # provide AF family data for use in this module
 

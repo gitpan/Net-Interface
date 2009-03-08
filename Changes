@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Interface.
 
+1.009  Sat Mar  7 13:28:54 PST 2009
+	As a work-around for broken Solaris headers in some distributions,
+	remove "C" initialization constructors and replace with a Perl call
+	during load to register various "flavors" of ifreq and ifaddr routines
+
+	add cppflags, ldflags, lddlflags to environment for pcap check
+
 1.008  Sun Mar  1 15:22:06 PST 2009
 	Add check for improperly truncated ifaddrs entry in 
 	Interfaces.xs / getheifs

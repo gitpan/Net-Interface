@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_in6_ifreq.c	version 0.05	2-25-09				*
+ * ni_in6_ifreq.c	version 0.06	3-7-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -43,8 +43,7 @@ DESCRIPTION
 
 #include "localconf.h"
 
-#ifndef __ni_Linux
-#ifdef HAVE_STRUCT_IN6_IFREQ
+#if !defined (__ni_Linux) && defined (HAVE_STRUCT_IN6_IFREQ)
 
 static void *
 _ni_getifreqs(int fd, void * vifc)
@@ -408,11 +407,18 @@ static struct ni_ifconf_flavor ni_ifconf_flav_ni_ifreq = {
     .developer		= ni_flav_in6_ifreq_developer,
 };
 
-void __attribute__((constructor))
-ni_in6_ifreq_ctor(void)
+void
+ni_in6_ifreq_ctor()
 {
     ni_ifcf_register(&ni_ifconf_flav_ni_ifreq);
 }
+
+#else
     
-#endif	/* have in6_ifreq */
-#endif	/* ! __ni_Linux	  */
+void
+ni_in6_ifreq_ctor()
+{
+    return;
+}
+
+#endif	/* have in6_ifreq && ! __ni_Linux	  */

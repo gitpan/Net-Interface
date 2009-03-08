@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_linuxproc.c	version 0.02 2-23-09				*
+ * ni_linuxproc.c	version 0.03 3-7-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -372,10 +372,30 @@ static struct ni_ifconf_flavor ni_flavor_linuxproc = {
     .developer		= ni_flav_linuxproc_developer,
 };
 
-void __attribute__((constructor))
-ni_linuxproc_ctor(void)
+void
+ni_linuxproc_ctor()
 {
-    ni_ifcf_register(&ni_flavor_linuxproc);
+    struct stat not_used;
+    int error, retry = 2;
+
+/*	check for 'proc' file system available	*/
+    while (retry > 0) {
+      if ((error = stat("/proc",&not_used)) == 0) {
+          ni_ifcf_register(&ni_flavor_linuxproc);
+          break;
+      }
+      else if (error != EINTR)
+          return;
+      error -= 1;
+    }
+}
+
+#else
+
+void
+ni_linuxproc_ctor()
+{
+    return;
 }
 
 #endif	/*	__ni_Linux	*/

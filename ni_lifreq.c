@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_lifreq.c	version 0.04 2-25-09					*
+ * ni_lifreq.c	version 0.05 3-7-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -375,10 +375,18 @@ static struct ni_ifconf_flavor ni_flavor_lifreq = {
     .developer		= ni_flav_lifreq_developer,
 };
 
-void __attribute__((constructor))
-ni_lifreq_ctor(void)
+void
+ni_lifreq_ctor()
 {
     ni_ifcf_register(&ni_flavor_lifreq);
+}
+
+#else
+    
+void
+ni_lifreq_ctor()
+{
+    return;
 }
     
 #endif	/* have lifreq */

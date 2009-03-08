@@ -1695,7 +1695,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 # AX_IN_STDLIB(lowercase_funcname, UPPERCASE_FUNCNAME)
 # ---------------------------------------------------------
-# checks if the function is present in the netinet/in.h file
+# checks if the function is present in the stdlib.h file
 # and sets SIZEOF_SOCKFUNC if found
 
 
@@ -14047,7 +14047,7 @@ for ac_lib in '' pcap; do
     ac_res="none required"
   else
     ac_res=-l$ac_lib
-    LIBS="-l$ac_lib -shared $ac_func_search_save_LIBS"
+    LIBS="-l$ac_lib $LDDLFLAGS $ac_func_search_save_LIBS"
   fi
   rm -f conftest.$ac_objext conftest$ac_exeext
 if { (ac_try="$ac_link"

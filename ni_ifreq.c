@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_ifreq.c	version 0.03	2-25-09					*
+ * ni_ifreq.c	version 0.04	3-7-09					*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -246,10 +246,18 @@ static struct ni_ifconf_flavor ni_flavor_ifreq = {
     .developer		= ni_flav_ifreq_developer,
 };
 
-void __attribute__((constructor))
-ni_ifreq_ctor(void)
+void
+ni_ifreq_ctor()
 {
     ni_ifcf_register(&ni_flavor_ifreq);
 }
+
+#else
+
+void
+ni_ifreq_ctor()
+{
+    return;
+};
 
 #endif	/* have ifreq */
