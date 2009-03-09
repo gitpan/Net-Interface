@@ -1,6 +1,6 @@
 
 /* ********************************************************************	*
- * ni_linuxproc.c	version 0.03 3-7-09				*
+ * ni_linuxproc.c	version 0.04 3-9-09				*
  *									*
  *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
  *									*
@@ -42,21 +42,34 @@
 
 #define _PATH_PROCNET_DEV	       "/proc/net/dev"
 #define _PATH_PROCNET_IFINET6	   "/proc/net/if_inet6"
-# ifndef HAVE_RTNETLINK_H
 
-/*	from /linux/include/linux/rtnetlink.h	*/
+/*	should be  include from /linux/include/linux/rtnetlink.h	*/
 
 /* ifa_flags */
+#ifndef IFA_F_SECONDARY
 #define IFA_F_SECONDARY		0x01
+#endif
+#ifndef IFA_F_TEMPORARY
 #define IFA_F_TEMPORARY		IFA_F_SECONDARY
+#endif
+#ifndef IFA_F_NODAD
 #define IFA_F_NODAD		0x02
+#endif
+#ifndef IFA_F_OPTIMISTIC
 #define IFA_F_OPTIMISTIC	0x04
+#endif
+#ifndef IFA_F_HOMEADDRESS
 #define IFA_F_HOMEADDRESS	0x10
+#endif
+#ifndef IFA_F_DEPRECATED
 #define IFA_F_DEPRECATED	0x20
+#endif
+#ifndef IFA_F_TENTATIVE
 #define IFA_F_TENTATIVE		0x40
+#endif
+#ifndef IFA_F_PERMANENT
 #define IFA_F_PERMANENT		0x80
-
-# endif
+#endif
 
 static void
 lx_ifa_f_flags(int flags)

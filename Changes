@@ -1,5 +1,10 @@
 Revision history for Perl extension Net::Interface.
 
+1.010  Mon Mar  9 01:43:59 PDT 2009
+	in ni_linuxproc.c, #ifdef and #define some IFA_xxx 
+	symbols that appear to be missing in some linux/rtnetlink.h 
+	headers in some? linux distros 
+
 1.009  Sat Mar  7 13:28:54 PST 2009
 	As a work-around for broken Solaris headers in some distributions,
 	remove "C" initialization constructors and replace with a Perl call
