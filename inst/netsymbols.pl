@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # #####################################################################	#
-# netsymbols.pl	version 0.08	2/28/09, michael@bizsystems.com		#
+# netsymbols.pl	version 0.09	3-23-09, michael@bizsystems.com		#
 #									#
 #									#
 #     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	#
@@ -281,7 +281,7 @@ const ni_iff_t ni_af_sym_tab[] = {
 |;
 ### populate exports
 
-print NFe q|#!/usr/bin/perl
+print NFe q|#!|. $Config{perlpath} .q|
 #
 # DO NOT ALTER THIS FILE
 # IT IS WRITTEN BY Makefile.PL and inst/netsymbols.pl
