@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::Interface.
 
+1.012  Mon Mar  8 10:42:51 PST 2010
+	Interface.xs	add test for NULL interface value to skip invalids
+	thanks to Brian West <brian@freeswitch.org> for the fix
+
+	typo update in Developer.pm
+
 1.011  Mon Mar 23 13:55:58 PDT 2009
 	update inst/netsymbols.pl v0.09 to use $Config{perlpath}
 	instead of the default '/usr/bin/perl' when building 

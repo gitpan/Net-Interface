@@ -1,8 +1,8 @@
 
 /* ********************************************************************	*
- * Interface.xs		version 1.04	2-27-09				*
+ * Interface.xs		version 1.05	3-8-10				*
  *									*
- *     COPYRIGHT 2008-2009 Michael Robinton <michael@bizsystems.com>	*
+ *     COPYRIGHT 2008-2010 Michael Robinton <michael@bizsystems.com>	*
  *									*
  * This program is free software; you can redistribute it and/or modify	*
  * it under the terms of either:					*
@@ -324,6 +324,8 @@ getheifs(SV ** sp, I32 ax, I32 items, SV * ref, HV * stash, int ix, char * keyna
 /* fetch reference to interface ref		*/
 		hface = (HV*)SvRV(*hv_fetch(ifaces,ifap->ifa_name,len,0));
 	    else {
+/* skip invalids */
+		if (ifap->ifa_addr == NULL) goto nextname;
 /* create an HV to hold this interface		*/
 		hface = newHV();
 /* and insert ref into unique/tmp storage hash	*/

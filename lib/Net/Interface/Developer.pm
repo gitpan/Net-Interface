@@ -2,7 +2,7 @@ package Net::Interface::Developer;
 
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 =pod
 
@@ -305,7 +305,6 @@ enumerated above on success.
 Extracts information about the type of ipV6 address. The returned value may
 be passed to the NEXT function call to print.
 
-=item 
 =item int ni_lx_map2scope(int lscope)
 
 This function maps I<Linux> style scope bits to their RFC-2373 equivalent.
